@@ -1,5 +1,4 @@
-DTSF: Stands for digital twin security framework
+DTSS: Stands for digital twin security solution
 
-Its a security framework develop to monitor any network the framework is
-installed on it The framework use ML based intrusion detection to detect and
-report attacks in near real-time on a network
+Its a security solution develop to monitor a given digital twin network
+The framework use ML based intrusion detection to detect and report attacks in near real-time

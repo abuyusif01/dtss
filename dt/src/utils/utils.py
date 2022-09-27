@@ -20,7 +20,7 @@ fp_logger = build_debug_logger(
     bytes_per_file=10000,
     rotating_files=2,
     lformat="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    ldir="logs/",
+    ldir="../src/logs/",
     suffix="",
 )
 

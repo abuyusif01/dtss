@@ -2,7 +2,7 @@
 FP tests.py
 """
 
-from utils.utils import fp_logger
+from utils import fp_logger
 
 
 def test_fp_logger():

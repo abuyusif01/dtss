@@ -3,16 +3,15 @@ FP plc2.py
 """
 
 from minicps.devices import PLC
-from utils.utils import PLC2_DATA, STATE
-from utils.utils import PLC2_PROTOCOL, PLC2_ADDR
-from utils.utils import PLC_PERIOD_SEC  # PLC_SAMPLES
-from utils.utils import SENSOR2
+from utils import PLC2_DATA, STATE
+from utils import PLC2_PROTOCOL, PLC2_ADDR
+from utils import PLC_PERIOD_SEC  # PLC_SAMPLES
 
 import time
 import logging
 
 
-
+SENSOR2 = ('SENSOR2-FL', 2)
 
 
 class FPPLC2(PLC):
@@ -20,7 +19,7 @@ class FPPLC2(PLC):
     # boot process
     def pre_loop(self, sleep=0.6):
         print ('DEBUG: FP PLC2 booting process (enter pre_loop)')
-        print()
+        print
         # wait for the other plcs
         time.sleep(sleep)
 
@@ -31,7 +30,7 @@ class FPPLC2(PLC):
                 """
 
         print ('DEBUG: FP PLC2 enters main_loop.')
-        print()
+        print
         # FYI: BSD-syslog format (RFC 3164), e.g. <133>Feb 25 14:09:07 webserver syslogd: restart   PRI <Facility*8+Severity>, HEADER (timestamp host), MSG (program/process message)
         logging.basicConfig(filename='logs/plc2.log',
                             format='%(levelname)s %(asctime)s ' + PLC2_ADDR + ' %(funcName)s %(message)s',
@@ -56,7 +55,8 @@ class FPPLC2(PLC):
 
             time.sleep(PLC_PERIOD_SEC)
             # count += 1
-            print ('DEBUG FP PLC2 shutdown')
+
+        print ('DEBUG FP PLC2 shutdown')
 
 
 if __name__ == "__main__":

@@ -1,16 +1,12 @@
 """
-
-todo: might need to edit this file (Abubakar)
 FP plc1.py
 """
 
 from minicps.devices import PLC
-from utils.utils import PLC1_DATA, PLC1_PROTOCOL, PLC1_ADDR, STATE
-from utils.utils import PLC2_ADDR, PLC3_ADDR
-from utils.utils import PLC_PERIOD_SEC  # PLC_SAMPLES
-from utils.utils import TANK_M, BOTTLE_M, SENSOR2_THRESH
-from utils.utils import SENSOR1, ACTUATOR1
-from utils.utils import SENSOR2_1, SENSOR2_2, SENSOR3_1, SENSOR3_3
+from utils import PLC1_DATA, PLC1_PROTOCOL, PLC1_ADDR, STATE
+from utils import PLC2_ADDR, PLC3_ADDR
+from utils import PLC_PERIOD_SEC  # PLC_SAMPLES
+from utils import TANK_M, BOTTLE_M, SENSOR2_THRESH
 import time
 import logging
 import csv
@@ -18,6 +14,13 @@ import datetime
 import os.path
 
 # tag addresses
+SENSOR1 = ("SENSOR1-LL-tank", 1)
+ACTUATOR1 = ("ACTUATOR1-MV", 1)
+# interlocks to plc2 and plc3
+SENSOR2_1 = ("SENSOR2-FL", 1)  # to be sent to PLC2
+SENSOR2_2 = ("SENSOR2-FL", 2)  # to be received from PLC2
+SENSOR3_1 = ("SENSOR3-LL-bottle", 1)  # to be sent to PLC3
+SENSOR3_3 = ("SENSOR3-LL-bottle", 3)  # to be received from PLC3
 
 
 class FPPLC1(PLC):
@@ -25,7 +28,7 @@ class FPPLC1(PLC):
     # boot process
     def pre_loop(self, sleep=0.1):
         print("DEBUG: FP PLC1 enters pre_loop")
-        print()
+        print
 
         time.sleep(sleep)
 
@@ -103,7 +106,8 @@ class FPPLC1(PLC):
             # read from PLC2
             try:
                 # estimated_flowlevel = float(self.get(SENSOR2_2))
-                flowlevel = float(self.receive(SENSOR2_2, PLC2_ADDR))
+                # flowlevel = float(self.receive(SENSOR2_2, PLC2_ADDR))
+                flowlevel = float(self.get(SENSOR2_2))
                 print("DEBUG PLC1 - receive flowlevel (SENSOR 2): %f" % flowlevel)
                 self.send(SENSOR2_1, flowlevel, PLC1_ADDR)
 
@@ -132,7 +136,8 @@ class FPPLC1(PLC):
             # read from PLC3
             try:
                 # estimated_liquidlevel_bottle = float(self.get(SENSOR3_3))
-                liquidlevel_bottle = float(self.receive(SENSOR3_3, PLC3_ADDR))
+                # liquidlevel_bottle = float(self.receive(SENSOR3_3, PLC3_ADDR))
+                liquidlevel_bottle = float(self.get(SENSOR3_3))
                 print(
                     "DEBUG PLC1 - receive liquid level of bottle (SENSOR 3): %f"
                     % liquidlevel_bottle
@@ -177,8 +182,8 @@ class FPPLC1(PLC):
                     liquidlevel_tank, flowlevel, liquidlevel_bottle, motor_status, count
                 )
                 count = 1
-            time.sleep(PLC_PERIOD_SEC)
-            print("DEBUG FP PLC1 shutdown")
+                time.sleep(PLC_PERIOD_SEC)
+                print("DEBUG FP PLC1 shutdown")
 
 
 if __name__ == "__main__":

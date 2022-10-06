@@ -1,4 +1,4 @@
-#! /usr/bin/env python2.7
+#! /usr/bin/env python
 ##### Script to launch calculated measurement modification attack to scale up the actual values by a random value from (0,1] #####
 ##### Takes one command line argument: PLC2/PLC3/BOTH #####
 from netfilterqueue import NetfilterQueue

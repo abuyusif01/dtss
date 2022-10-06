@@ -2,7 +2,6 @@
 ##### Takes 3 command line arguments: 1) Start time of attack 2) End time of attack 3)  Label: Calculated measurement modification, Naive measurement modification etc #####
 ##### Example: run 'python label1.py '2021-07-01 16:04:07.681880' '2021-07-01 16:05:11.900075' Calculated Measurement Modification #####
 import csv
-import math
 import sys
 
 start_time = sys.argv[1]

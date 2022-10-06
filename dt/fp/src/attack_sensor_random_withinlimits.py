@@ -1,4 +1,4 @@
-#! /usr/bin/env python2.7
+#! /usr/bin/env python
 ##### Script to launch naive measurement modification attack #####
 ##### Takes one command line argument: PLC2/PLC3/BOTH #####
 

@@ -111,12 +111,12 @@ NETMASK = '/24'
 # samples for simulation
 PLC_PERIOD_SEC = 0.50  # plc update rate in seconds
 PLC_PERIOD_HOURS = PLC_PERIOD_SEC / 3600.0
-# PLC_SAMPLES = 1000
+PLC_SAMPLES = 1000 # take input till 1000 seconds 
 
 PP_RESCALING_HOURS = 100   # physical process (pp)
 PP_PERIOD_SEC = 0.25  # physical process update rate in seconds
 PP_PERIOD_HOURS = (PP_PERIOD_SEC / 3600.0) * PP_RESCALING_HOURS
-# PP_SAMPLES = int(PLC_PERIOD_SEC / PP_PERIOD_SEC) * PLC_SAMPLES
+PP_SAMPLES = int(PLC_PERIOD_SEC / PP_PERIOD_SEC) * PLC_SAMPLES
 
 HMI_PERIOD_SEC = 1
 

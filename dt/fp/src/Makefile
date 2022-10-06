@@ -1,2 +1,2 @@
 clean:
-	rm -rf logs/data.csv
+	rm -rf logs/*

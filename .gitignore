@@ -3,3 +3,4 @@ logs/**
 *.sqlite-journal
 *.pyc
 .vscode/**
+__pycache__/**

@@ -4,24 +4,25 @@ FP plc1.py
 
 from minicps.devices import PLC
 from utils import PLC1_DATA, PLC1_PROTOCOL, PLC1_ADDR, STATE
-from utils import PLC2_ADDR, PLC3_ADDR
-from utils import PLC_PERIOD_SEC  # PLC_SAMPLES
+from utils import PLC_PERIOD_SEC 
 from utils import TANK_M, BOTTLE_M, SENSOR2_THRESH
 import time
 import logging
 import csv
 import datetime
-import os.path
+import sys
 
 # tag addresses
 SENSOR1 = ("SENSOR1-LL-tank", 1)
 ACTUATOR1 = ("ACTUATOR1-MV", 1)
+
 # interlocks to plc2 and plc3
 SENSOR2_1 = ("SENSOR2-FL", 1)  # to be sent to PLC2
 SENSOR2_2 = ("SENSOR2-FL", 2)  # to be received from PLC2
 SENSOR3_1 = ("SENSOR3-LL-bottle", 1)  # to be sent to PLC3
 SENSOR3_3 = ("SENSOR3-LL-bottle", 3)  # to be received from PLC3
 
+trigger = False # magic values
 
 class FPPLC1(PLC):
 
@@ -44,10 +45,9 @@ class FPPLC1(PLC):
                 "motor_status",
             ]
             csv_writer = csv.DictWriter(writeobj, fieldnames=fieldnames)
-            if count == 0:
-                csv_writer.writeheader()
-                # count = 1
 
+            if count == 0:  # we basically write the header only once
+                csv_writer.writeheader()
             csv_writer.writerow(
                 {
                     "timestamp": str(datetime.datetime.now()),
@@ -80,7 +80,7 @@ class FPPLC1(PLC):
 
         count = 0
         while True:
-            # get sensor1 value
+            # get sensor1 value (tank liquid level) from self
             liquidlevel_tank = float(
                 self.get(SENSOR1)
             )  # physical process simulation (sensor 1 reads value)
@@ -101,12 +101,10 @@ class FPPLC1(PLC):
                     % (liquidlevel_tank, TANK_M["LowerBound"])
                 )
                 self.set(ACTUATOR1, 0)  # CLOSE actuator mv
-                self.send(ACTUATOR1, 0, PLC1_ADDR)
+                self.send(ACTUATOR1, 0, PLC1_ADDR)  # send the value to plc1
 
             # read from PLC2
             try:
-                # estimated_flowlevel = float(self.get(SENSOR2_2))
-                # flowlevel = float(self.receive(SENSOR2_2, PLC2_ADDR))
                 flowlevel = float(self.get(SENSOR2_2))
                 print("DEBUG PLC1 - receive flowlevel (SENSOR 2): %f" % flowlevel)
                 self.send(SENSOR2_1, flowlevel, PLC1_ADDR)
@@ -135,8 +133,6 @@ class FPPLC1(PLC):
 
             # read from PLC3
             try:
-                # estimated_liquidlevel_bottle = float(self.get(SENSOR3_3))
-                # liquidlevel_bottle = float(self.receive(SENSOR3_3, PLC3_ADDR))
                 liquidlevel_bottle = float(self.get(SENSOR3_3))
                 print(
                     "DEBUG PLC1 - receive liquid level of bottle (SENSOR 3): %f"
@@ -177,20 +173,26 @@ class FPPLC1(PLC):
                 liquidlevel_bottle = 999
 
             motor_status = int(self.get(ACTUATOR1))
-            if os.path.isfile("trigger.txt"):
+
+            global trigger
+            if trigger:  # a bit hacky, but it works
                 self.store_values(
                     liquidlevel_tank, flowlevel, liquidlevel_bottle, motor_status, count
                 )
                 count = 1
                 time.sleep(PLC_PERIOD_SEC)
-                print("DEBUG FP PLC1 shutdown")
+            print("DEBUG FP PLC1 shutdown")
 
 
-if __name__ == "__main__":
-    plc1 = FPPLC1(
-        name="plc1",
-        state=STATE,
-        protocol=PLC1_PROTOCOL,
-        memory=PLC1_DATA,
-        disk=PLC1_DATA,
-    )
+if __name__ == "__main__":  # bit hacky, but it works
+    if sys.argv[1] == "capture":
+        trigger = True
+        plc1 = FPPLC1(
+            name="plc1",
+            state=STATE,
+            protocol=PLC1_PROTOCOL,
+            memory=PLC1_DATA,
+            disk=PLC1_DATA,
+        )
+else:
+    pass

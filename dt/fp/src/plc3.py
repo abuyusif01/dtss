@@ -41,7 +41,7 @@ class FPPLC3(PLC):
             level=logging.DEBUG,
         )
 
-        # count = 0
+        count = 0
         while count <= PLC_SAMPLES:
             # physical process
             liquidlevel_bottle = float(self.get(SENSOR3))

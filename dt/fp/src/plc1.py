@@ -4,13 +4,14 @@ FP plc1.py
 
 from minicps.devices import PLC
 from utils import PLC1_DATA, PLC1_PROTOCOL, PLC1_ADDR, STATE
-from utils import PLC_PERIOD_SEC 
+from utils import PLC_PERIOD_SEC
 from utils import TANK_M, BOTTLE_M, SENSOR2_THRESH
 import time
 import logging
 import csv
 import datetime
 import sys
+import os
 
 # tag addresses
 SENSOR1 = ("SENSOR1-LL-tank", 1)
@@ -22,7 +23,8 @@ SENSOR2_2 = ("SENSOR2-FL", 2)  # to be received from PLC2
 SENSOR3_1 = ("SENSOR3-LL-bottle", 1)  # to be sent to PLC3
 SENSOR3_3 = ("SENSOR3-LL-bottle", 3)  # to be received from PLC3
 
-trigger = False # magic values
+trigger = False  # magic values
+
 
 class FPPLC1(PLC):
 
@@ -174,25 +176,20 @@ class FPPLC1(PLC):
 
             motor_status = int(self.get(ACTUATOR1))
 
-            global trigger
-            if trigger:  # a bit hacky, but it works
+            if os.path.isfile("trigger.txt"):
+                # Collect relevant process measurements
                 self.store_values(
                     liquidlevel_tank, flowlevel, liquidlevel_bottle, motor_status, count
                 )
                 count = 1
-                time.sleep(PLC_PERIOD_SEC)
             print("DEBUG FP PLC1 shutdown")
 
 
-if __name__ == "__main__":  # bit hacky, but it works
-    if sys.argv[1] == "capture":
-        trigger = True
-        plc1 = FPPLC1(
-            name="plc1",
-            state=STATE,
-            protocol=PLC1_PROTOCOL,
-            memory=PLC1_DATA,
-            disk=PLC1_DATA,
-        )
-else:
-    pass
+if __name__ == "__main__":
+    plc1 = FPPLC1(
+        name="plc1",
+        state=STATE,
+        protocol=PLC1_PROTOCOL,
+        memory=PLC1_DATA,
+        disk=PLC1_DATA,
+    )

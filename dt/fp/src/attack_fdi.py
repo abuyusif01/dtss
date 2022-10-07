@@ -64,11 +64,6 @@ class FPHMI(HMI):
                 logging.info("FDI toggle: Actuator status changed to %s" % toggle_status)
 
 
-
-
-
-            
-
         print("END TIME:", str(dt.now()))
 
 

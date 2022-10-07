@@ -22,22 +22,20 @@ SENSOR2_2 = ("SENSOR2-FL", 2)  # to be received from PLC2
 SENSOR3_1 = ("SENSOR3-LL-bottle", 1)  # to be sent to PLC3
 SENSOR3_3 = ("SENSOR3-LL-bottle", 3)  # to be received from PLC3
 
-trigger = False  # magic values
-
 
 class FPPLC1(PLC):
 
     # boot process
     def pre_loop(self, sleep=0.1):
         print("DEBUG: FP PLC1 enters pre_loop")
-        print
+        print()
 
         time.sleep(sleep)
 
     def store_values(
         self, liquidlevel_tank, flowlevel, liquidlevel_bottle, motor_status, count
     ):
-        with open("logs/data.csv", "a+") as writeobj:
+        with open("logs/data_.csv", "a") as writeobj:
             fieldnames = [
                 "timestamp",
                 "tank_liquidlevel",
@@ -49,6 +47,7 @@ class FPPLC1(PLC):
 
             if count == 0:  # we basically write the header only once
                 csv_writer.writeheader()
+
             csv_writer.writerow(
                 {
                     "timestamp": str(datetime.datetime.now()),
@@ -68,7 +67,7 @@ class FPPLC1(PLC):
         """
 
         print("DEBUG: FP PLC1 enters main_loop.")
-        print
+        print ()
         # FYI: BSD-syslog format (RFC 3164), e.g. <133>Feb 25 14:09:07 webserver syslogd: restart   PRI <Facility*8+Severity>, HEADER (timestamp host), MSG (program/process message)
         logging.basicConfig(
             filename="logs/plc1.log",
@@ -180,12 +179,16 @@ class FPPLC1(PLC):
 
             if os.path.isfile("trigger.txt"):
                 # Collect relevant process measurements
+                print ("INFO PLC1 - Trigger file found. Collecting measurements")
                 self.store_values(
                     liquidlevel_tank, flowlevel, liquidlevel_bottle, motor_status, count
                 )
                 count = 1
-                time.sleep(PLC_PERIOD_SEC)
-            print("DEBUG FP PLC1 shutdown")
+                # time.sleep(.1)
+
+    def _stop(self):
+        print("DEBUG FP PLC3 shutdown")
+        return super()._stop()
 
 
 if __name__ == "__main__":

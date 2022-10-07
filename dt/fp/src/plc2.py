@@ -42,7 +42,8 @@ class FPPLC2(PLC):
         )
 
         count = 0
-        while count <= PLC_SAMPLES:
+        # while count <= PLC_SAMPLES:
+        while True:
             # physical process
             flowlevel = float(self.get(SENSOR2))
             print("PLC2 - get flowlevel (SENSOR 2): %f" % flowlevel)
@@ -59,7 +60,9 @@ class FPPLC2(PLC):
             time.sleep(PLC_PERIOD_SEC)
             count += 1
 
-        print("DEBUG FP PLC2 shutdown")
+    def _stop(self):
+        print("DEBUG FP PLC3 shutdown")
+        return super()._stop()
 
 
 if __name__ == "__main__":

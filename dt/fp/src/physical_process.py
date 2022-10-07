@@ -70,6 +70,11 @@ class LiquidTank(Tank):
             count += 1
             time.sleep(PP_PERIOD_SEC)
 
+    def _stop(self):
+        print("DEBUG phys-proc: stopping")
+        return super()._stop()
+
+
 if __name__ == "__main__":
 
     rwt = LiquidTank(

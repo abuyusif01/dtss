@@ -56,7 +56,7 @@ class Bottle(Tank):
 
             if new_level >= BOTTLE_M["UpperBound"]:
                 print(
-                    "DEBUG phys-proc: Bottle above upperbound threshold ",
+                    "DEBUG phys-proc bottle: Bottle above upperbound threshold ",
                     BOTTLE_M["UpperBound"],
                 )
                 # break
@@ -65,10 +65,14 @@ class Bottle(Tank):
                     PP_PERIOD_SEC * 10
                 )  # simulate time to remove the bottle and hand in a empty one
                 self.level = self.set(SENSOR3, BOTTLE_INIT_LEVEL)
-                print("DEBUG phys-proc: New bottle to fill")
+                print("DEBUG phys-proc bottle: New bottle to fill")
 
             count += 1
             time.sleep(PP_PERIOD_SEC)
+
+    def _stop(self):
+        print("DEBUG phys-proc bottle: Bottle stopped")
+        return super()._stop()
 
 
 if __name__ == "__main__":

@@ -35,7 +35,8 @@ class FPCPS(MiniCPS):
             plc3.cmd(sys.executable + " -u " + " plc3.py  &> logs/plc3.log &")
             time.sleep (sleep)
             plc2.cmd(sys.executable + " -u " + " plc2.py &> logs/plc2.log &")
-            time.sleep (sleep)
+            time.sleep (sleep * 3) # sleeping a bit more to make sure the PLCs are up
+
             plc1.cmd(sys.executable + " -u " + " plc1.py  &> logs/plc1.log &")
             time.sleep (sleep)
             net.terms += makeTerm(plc1, title="plc1", display=None)
@@ -46,15 +47,18 @@ class FPCPS(MiniCPS):
             time.sleep (sleep)
 
         else:
-            net.terms += makeTerm(s1, title="s1", display=None)
+            # Th first 4 mostly wont change
+            net.terms += makeTerm(s1, title="physical_process_bottle", display=None, cmd="python3 physical_process_bottle.py")
             time.sleep (sleep)
-            net.terms += makeTerm(s1, title="s1", display=None)
+            net.terms += makeTerm(s1, title="physical_process", display=None, cmd="python3 physical_process.py")
             time.sleep (sleep)
+            net.terms += makeTerm(plc3, title="plc3", display=None, cmd="python3 plc3.py")
+            time.sleep (sleep)
+            net.terms += makeTerm(plc2, title="plc2", display=None, cmd="python3 plc2.py")
+            time.sleep (sleep)
+
+
             net.terms += makeTerm(plc1, title="plc1", display=None)
-            time.sleep (sleep)
-            net.terms += makeTerm(plc2, title="plc2", display=None)
-            time.sleep (sleep)
-            net.terms += makeTerm(plc3, title="plc3", display=None)
             time.sleep (sleep)
             net.terms += makeTerm(attacker, title="attacker", display=None)
             time.sleep (sleep)

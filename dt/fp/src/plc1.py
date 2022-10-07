@@ -10,7 +10,6 @@ import time
 import logging
 import csv
 import datetime
-import sys
 import os
 
 # tag addresses
@@ -92,8 +91,12 @@ class FPPLC1(PLC):
             self.send(
                 SENSOR1, liquidlevel_tank, PLC1_ADDR
             )  # network process simulation (value of sensor 1 is stored as enip tag)
+            self.set(SENSOR1, liquidlevel_tank)  # logical process simulation (value of sensor 1 is stored in the plc1 memory)
+
 
             if liquidlevel_tank <= TANK_M["LowerBound"]:
+                """The only way we can reach this point is if we command line inject the value of the sensor to be lower than the lower bound of the tank"""
+
                 print(
                     "INFO PLC1 - liquid level of tank (SENSOR 1) under LowerBound: %.2f <= %.2f -> close mv (ACTUATOR 1)."
                     % (liquidlevel_tank, TANK_M["LowerBound"])
@@ -173,7 +176,6 @@ class FPPLC1(PLC):
                     "Liquid level (SENSOR 3) is not received. Program is unable to proceed properly"
                 )
                 liquidlevel_bottle = 999
-
             motor_status = int(self.get(ACTUATOR1))
 
             if os.path.isfile("trigger.txt"):
@@ -182,6 +184,7 @@ class FPPLC1(PLC):
                     liquidlevel_tank, flowlevel, liquidlevel_bottle, motor_status, count
                 )
                 count = 1
+                time.sleep(PLC_PERIOD_SEC)
             print("DEBUG FP PLC1 shutdown")
 
 

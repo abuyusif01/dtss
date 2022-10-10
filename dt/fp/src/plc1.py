@@ -26,7 +26,7 @@ SENSOR3_3 = ("SENSOR3-LL-bottle", 3)  # to be received from PLC3
 class FPPLC1(PLC):
 
     # boot process
-    def pre_loop(self, sleep=0.1):
+    def pre_loop(self, sleep=0.5):
         print("DEBUG: FP PLC1 enters pre_loop")
         print()
 
@@ -184,7 +184,7 @@ class FPPLC1(PLC):
                     liquidlevel_tank, flowlevel, liquidlevel_bottle, motor_status, count
                 )
                 count = 1
-                # time.sleep(.1)
+                time.sleep(PLC_PERIOD_SEC)
 
     def _stop(self):
         print("DEBUG FP PLC3 shutdown")

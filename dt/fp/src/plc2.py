@@ -17,13 +17,13 @@ SENSOR2 = ("SENSOR2-FL", 2)
 class FPPLC2(PLC):
 
     # boot process
-    def pre_loop(self, sleep=0.6):
+    def pre_loop(self):
         print("DEBUG: FP PLC2 booting process (enter pre_loop)")
         print
         # wait for the other plcs
-        time.sleep(sleep)
+        time.sleep(PLC_PERIOD_SEC)
 
-    def main_loop(self, sleep=0.0):
+    def main_loop(self):
         """plc2 main loop.
         - read flow level (sensor2)
         - update internal enip server

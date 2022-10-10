@@ -81,25 +81,25 @@ class FPCPS(MiniCPS):
                 display=None,
                 cmd="python3 plc2.py",
             )
-            time.sleep(sleep * 2)
+            time.sleep(sleep)
             net.terms += makeTerm(
                 plc1,
                 title="plc1",
                 display=None,
                 cmd="python3 plc1.py",
             )
-            time.sleep(sleep * 2)
-            timer = 20
-            net.terms += makeTerm(
-                hmi,
-                title="hmi",
-                display=None,
-                cmd=f"python3 attack_fdi.py {timer}",
-            )
+            time.sleep(
+                sleep * 2
+            )  # make sure everything is up and running before starting the HMI and attacker
+            timer = 10  # number in minutes
+            # net.terms += makeTerm(
+            #     hmi,
+            #     title="hmi",
+            #     display=None,
+            #     cmd=f"python3 attack_fdi.py {timer}",
+            # )
             time.sleep(sleep)
-
             net.terms += makeTerm(attacker, title="attacker", display=None)
-            time.sleep(sleep)
 
         CLI(self.net)
         self.net.stop()

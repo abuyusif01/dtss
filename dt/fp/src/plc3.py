@@ -17,13 +17,13 @@ SENSOR3 = ("SENSOR3-LL-bottle", 3)
 class FPPLC3(PLC):
 
     # boot process
-    def pre_loop(self, sleep=0.6):
+    def pre_loop(self):
         print("DEBUG: FP PLC3 booting process (enter pre_loop)")
         print
         # wait for the other plcs
-        time.sleep(sleep)
+        time.sleep(PLC_PERIOD_SEC)
 
-    def main_loop(self, sleep=0.0):
+    def main_loop(self):
         """plc3 main loop.
         - read liquid level of bottle (sensor3)
         - update internal enip server

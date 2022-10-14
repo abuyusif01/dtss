@@ -44,7 +44,7 @@ class LiquidTank(Tank):
                 # print "DEBUG phys-proc: Tank outflow  ", outflow
                 water_volume -= outflow
             elif int(actuator) == 0:
-                self.set(SENSOR2, 0.00)  # no outflow
+                self.set(SENSOR2, 10)  # no outflow
 
             # compute new water_level
             new_level = water_volume / self.section

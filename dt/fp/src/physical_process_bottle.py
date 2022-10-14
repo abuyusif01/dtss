@@ -52,6 +52,7 @@ class Bottle(Tank):
                 "DEBUG phys-proc bottle: new_level  %.5f m \t delta (volume): %.5f m3"
                 % (new_level, (new_level - self.level) * self.section)
             )
+            print("new_level: ", new_level)
             self.level = self.set(SENSOR3, new_level)
 
             if new_level >= BOTTLE_M["UpperBound"]:

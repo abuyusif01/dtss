@@ -6,3 +6,4 @@ logs/**
 __pycache__/**
 __pycache__
 logs/
+*.pkl

@@ -5,7 +5,7 @@ FP plc2.py
 import re
 from shutil import ExecError
 from minicps.devices import PLC
-from utils import PLC2_DATA, SERVER_ADDR, STATE
+from utils import PLC2_DATA, PORT, SERVER_ADDR, STATE
 from utils import PLC2_PROTOCOL, PLC2_ADDR
 from utils import PLC_PERIOD_SEC, PLC_SAMPLES
 
@@ -56,7 +56,7 @@ class FPPLC2(PLC):
                 self.send(SENSOR2, flowlevel, PLC2_ADDR)
                 try:
                     req = requests.get(
-                        f"http://{SERVER_ADDR}/set_value/{SENSOR2[0]}/{flowlevel}"
+                        f"http://{SERVER_ADDR}:{PORT}/set_value/{SENSOR2[0]}/{flowlevel}"
                     )
 
                     if req.text == "success":

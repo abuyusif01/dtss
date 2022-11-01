@@ -3,13 +3,14 @@ FP plc1.py
 """
 
 from minicps.devices import PLC
-from utils import PLC1_DATA, PLC1_PROTOCOL, PLC1_ADDR, STATE
+from utils import PLC1_DATA, PLC1_PROTOCOL, PLC1_ADDR, PORT, SERVER_ADDR, STATE
 from utils import PLC_PERIOD_SEC
 from utils import TANK_M, BOTTLE_M, SENSOR2_THRESH
 import time
 import logging
 import csv
 import datetime
+import requests
 import os
 
 # tag addresses
@@ -67,7 +68,7 @@ class FPPLC1(PLC):
         """
 
         print("DEBUG: FP PLC1 enters main_loop.")
-        print ()
+        print()
         # FYI: BSD-syslog format (RFC 3164), e.g. <133>Feb 25 14:09:07 webserver syslogd: restart   PRI <Facility*8+Severity>, HEADER (timestamp host), MSG (program/process message)
         logging.basicConfig(
             filename="logs/plc1.log",
@@ -90,8 +91,9 @@ class FPPLC1(PLC):
             self.send(
                 SENSOR1, liquidlevel_tank, PLC1_ADDR
             )  # network process simulation (value of sensor 1 is stored as enip tag)
-            self.set(SENSOR1, liquidlevel_tank)  # logical process simulation (value of sensor 1 is stored in the plc1 memory)
-
+            self.set(
+                SENSOR1, liquidlevel_tank
+            )  # logical process simulation (value of sensor 1 is stored in the plc1 memory)
 
             if liquidlevel_tank <= TANK_M["LowerBound"]:
                 """The only way we can reach this point is if we command line inject the value of the sensor to be lower than the lower bound of the tank"""
@@ -109,7 +111,17 @@ class FPPLC1(PLC):
 
             # read from PLC2
             try:
-                flowlevel = float(self.get(SENSOR2_2))
+                flowlevel = float(
+                    requests.get(
+                        f"http://{SERVER_ADDR}:{PORT}/get_value/{SENSOR2_2[0]}"
+                    ).text
+                )
+
+                print(
+                    "DEBUG PLC1 - receive liquid level of bottle (SENSOR 3): %f"
+                    % liquidlevel_bottle
+                )
+
                 print("DEBUG PLC1 - receive flowlevel (SENSOR 2): %f" % flowlevel)
                 self.send(SENSOR2_1, flowlevel, PLC1_ADDR)
 
@@ -137,7 +149,13 @@ class FPPLC1(PLC):
 
             # read from PLC3
             try:
-                liquidlevel_bottle = float(self.get(SENSOR3_3))
+                liquidlevel_bottle = float(
+                    requests.get(
+                        f"http://{SERVER_ADDR}:{PORT}/get_value/{SENSOR3_3[0]}"
+                    ).text
+                )
+                
+                
                 print(
                     "DEBUG PLC1 - receive liquid level of bottle (SENSOR 3): %f"
                     % liquidlevel_bottle
@@ -179,7 +197,7 @@ class FPPLC1(PLC):
 
             if os.path.isfile("trigger.txt"):
                 # Collect relevant process measurements
-                print ("INFO PLC1 - Trigger file found. Collecting measurements")
+                print("INFO PLC1 - Trigger file found. Collecting measurements")
                 self.store_values(
                     liquidlevel_tank, flowlevel, liquidlevel_bottle, motor_status, count
                 )

@@ -1,7 +1,7 @@
 from flask import Flask
 import sqlite3
 
-from utils import SERVER_ADDR
+from utils import PORT, SERVER_ADDR
 
 
 SCHEMA = "fp_db.sqlite"
@@ -99,8 +99,8 @@ app.add_endpoint(
     methods=["GET"],
 )
 
-try:
-    app.run(host=SERVER_ADDR, port=80, debug=False)
-except Exception as e:
-    app.run(host="localhost", port=8080, debug=True)
+# try:
+app.run(host=SERVER_ADDR, port=PORT, debug=True)
+# except Exception as e:
+# app.run(host="localhost", port=8080, debug=True)
 

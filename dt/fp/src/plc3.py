@@ -4,7 +4,7 @@ FP plc3.py
 
 from queue import LifoQueue
 from minicps.devices import PLC
-from utils import PLC3_DATA, SERVER_ADDR, STATE
+from utils import PLC3_DATA, PORT, SERVER_ADDR, STATE
 from utils import PLC3_PROTOCOL, PLC3_ADDR
 from utils import PLC_PERIOD_SEC, PLC_SAMPLES
 
@@ -55,7 +55,7 @@ class FPPLC3(PLC):
                 self.send(SENSOR3, liquidlevel_bottle, PLC3_ADDR)
                 try:
                     req = requests.get(
-                        f"http://{SERVER_ADDR}/set_value/{SENSOR3[0]}/{liquidlevel_bottle}"
+                        f"http://{SERVER_ADDR}:{PORT}/set_value/{SENSOR3[0]}/{liquidlevel_bottle}"
                     )
 
                     if req.text == "success":

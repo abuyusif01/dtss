@@ -2,13 +2,15 @@
 FP plc3.py
 """
 
+from queue import LifoQueue
 from minicps.devices import PLC
-from utils import PLC3_DATA, STATE
+from utils import PLC3_DATA, SERVER_ADDR, STATE
 from utils import PLC3_PROTOCOL, PLC3_ADDR
 from utils import PLC_PERIOD_SEC, PLC_SAMPLES
 
 import time
 import logging
+import requests
 
 
 SENSOR3 = ("SENSOR3-LL-bottle", 3)
@@ -42,8 +44,8 @@ class FPPLC3(PLC):
         )
 
         count = 0
-        # while count <= PLC_SAMPLES:
-        while True:
+        while count <= PLC_SAMPLES:
+        # while True:
             # physical process
             liquidlevel_bottle = float(self.get(SENSOR3))
             print("PLC3 - get liquidlevel_bottle (SENSOR 3): %i" % liquidlevel_bottle)
@@ -51,6 +53,22 @@ class FPPLC3(PLC):
             try:
                 # network capabilities
                 self.send(SENSOR3, liquidlevel_bottle, PLC3_ADDR)
+                try:
+                    req = requests.get(
+                        f"http://{SERVER_ADDR}/set_value/{SENSOR3[0]}/{liquidlevel_bottle}"
+                    )
+
+                    if req.text == "success":
+                        pass
+                    else:
+                        print("PLC2 - failed to update server DDOS attacker detected")
+                        logging.error("PLC3 - failed to update server DDOS attacker detected")
+                        exit(1)
+
+                except Exception as e:
+                    print("PLC2 - Exception: %s" % e)
+                    logging.debug("PLC2 - Exception: %s" % e)
+                    exit(1)
                 print(
                     "DEBUG PLC3 - receive liquidlevel_bottle (SENSOR 3): ",
                     liquidlevel_bottle,
@@ -61,7 +79,7 @@ class FPPLC3(PLC):
             except:
                 logging.info("Could not update internal ENIP tag (SENSOR 3)")
 
-            time.sleep(PLC_PERIOD_SEC) # sleep for .5 seconds
+            time.sleep(PLC_PERIOD_SEC)  # sleep for .5 seconds
             count += 1
 
     def _stop(self):

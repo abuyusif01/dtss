@@ -99,6 +99,8 @@ app.add_endpoint(
     methods=["GET"],
 )
 
-app.run(host=SERVER_ADDR, port=80, debug=False)
-# app.run(host="localhost", port=8080, debug=True)
+try:
+    app.run(host=SERVER_ADDR, port=80, debug=False)
+except Exception as e:
+    app.run(host="localhost", port=8080, debug=True)
 

@@ -45,6 +45,8 @@ class FPCPS(MiniCPS):
                 + " physical_process_bottle.py  &> logs/process_bottle.log &"
             )
             time.sleep(sleep)
+            server.cmd(sys.executable + " -u " + " server.py &> logs/server.log &")
+            time.sleep(sleep)
             plc3.cmd(sys.executable + " -u " + " plc3.py  &> logs/plc3.log &")
             time.sleep(sleep)
             plc2.cmd(sys.executable + " -u " + " plc2.py &> logs/plc2.log &")
@@ -78,6 +80,13 @@ class FPCPS(MiniCPS):
             )
             time.sleep(sleep)
             net.terms += makeTerm(
+                server,
+                title="server",
+                display=None,
+                cmd="python3 server.py",
+            )
+            time.sleep(sleep)
+            net.terms += makeTerm(
                 plc3,
                 title="plc3",
                 display=None,
@@ -100,12 +109,7 @@ class FPCPS(MiniCPS):
             time.sleep(
                 sleep * 2
             )  # make sure everything is up and running before starting the HMI and attacker
-            net.terms += makeTerm(
-                server, 
-                title="server",
-                display=None,
-                cmd="python3 server.py",
-            )
+
             timer = 10  # number in minutes
             net.terms += makeTerm(
                 hmi,

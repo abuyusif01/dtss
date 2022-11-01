@@ -4,7 +4,7 @@ FP topology
 
 from mininet.topo import Topo
 
-from utils import PLC1_MAC, PLC2_MAC, PLC3_MAC, HMI_MAC, ATTCKR_MAC
+from utils import PLC1_MAC, PLC2_MAC, PLC3_MAC, HMI_MAC, ATTCKR_MAC, SERVER_ADDR, SERVER_MAC
 from utils import PLC1_ADDR, PLC2_ADDR, PLC3_ADDR, HMI_ADDR, ATTCKR_ADDR, NETMASK
 
 
@@ -44,4 +44,10 @@ class FPTopo(Topo):
             'attacker',
             ip=ATTCKR_ADDR + NETMASK,
             mac=ATTCKR_MAC)
+        self.addLink(attacker, switch)
+
+        attacker = self.addHost(
+            'server',
+            ip=SERVER_ADDR + NETMASK,
+            mac=SERVER_MAC)
         self.addLink(attacker, switch)

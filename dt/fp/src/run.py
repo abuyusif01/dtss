@@ -23,11 +23,18 @@ class FPCPS(MiniCPS):
         net.start()
         net.pingAll()
 
-        plc1, plc2, plc3, s1, hmi, attacker = self.net.get(
-            "plc1", "plc2", "plc3", "s1", "hmi", "attacker"
+        plc1, plc2, plc3, s1, hmi, attacker, server = self.net.get(
+            "plc1",
+            "plc2",
+            "plc3",
+            "s1",
+            "hmi",
+            "attacker",
+            "server",
         )
 
         if not debug:
+
             s1.cmd(
                 sys.executable + " -u " + " physical_process.py  &> logs/process.log &"
             )
@@ -48,6 +55,8 @@ class FPCPS(MiniCPS):
             net.terms += makeTerm(plc1, title="plc1", display=None)
             time.sleep(sleep)
             net.terms += makeTerm(hmi, title="hmi", display=None)
+            time.sleep(sleep)
+            server.cmd(sys.executable + " -u " + " server.py &> logs/server.log &")
             time.sleep(sleep)
             net.terms += makeTerm(attacker, title="attacker", display=None)
             time.sleep(sleep)
@@ -91,6 +100,12 @@ class FPCPS(MiniCPS):
             time.sleep(
                 sleep * 2
             )  # make sure everything is up and running before starting the HMI and attacker
+            net.terms += makeTerm(
+                server, 
+                title="server",
+                display=None,
+                cmd="python3 server.py",
+            )
             timer = 10  # number in minutes
             net.terms += makeTerm(
                 hmi,

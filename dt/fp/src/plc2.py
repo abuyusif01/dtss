@@ -45,8 +45,8 @@ class FPPLC2(PLC):
         )
 
         count = 0
-        while count <= PLC_SAMPLES:
-        # while True:
+        # while count <= PLC_SAMPLES:
+        while True:
             # physical process
             flowlevel = float(self.get(SENSOR2))
             print("PLC2 - get flowlevel (SENSOR 2): %f" % flowlevel)
@@ -56,14 +56,17 @@ class FPPLC2(PLC):
                 self.send(SENSOR2, flowlevel, PLC2_ADDR)
                 try:
                     req = requests.get(
-                        f"http://{SERVER_ADDR}:{PORT}/set_value/{SENSOR2[0]}/{flowlevel}"
+                        f"http://{SERVER_ADDR}:{PORT}/set_value/{SENSOR2[0]}/{flowlevel}",
+                        timeout=0.1,
                     )
 
                     if req.text == "success":
                         pass
                     else:
                         print("PLC2 - failed to update server DDOS attacker detected")
-                        logging.error("PLC2 - failed to update server DDOS attacker detected")
+                        logging.error(
+                            "PLC2 - failed to update server DDOS attacker detected"
+                        )
                         exit(1)
 
                 except Exception as e:
@@ -75,7 +78,7 @@ class FPPLC2(PLC):
                 print("DEBUG PLC2 - receive flowlevel (SENSOR 2): ", flowlevel)
                 logging.info("Internal ENIP tag (SENSOR 2) updated: %.2f" % (flowlevel))
             except:
-                logging.info("Could not update internal ENIP tag (SENSOR 2)")
+                logging.error("Could not update internal ENIP tag (SENSOR 2)")
 
             time.sleep(PLC_PERIOD_SEC)
             count += 1

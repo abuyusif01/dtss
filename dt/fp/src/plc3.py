@@ -44,8 +44,8 @@ class FPPLC3(PLC):
         )
 
         count = 0
-        while count <= PLC_SAMPLES:
-        # while True:
+        # while count <= PLC_SAMPLES:
+        while True:
             # physical process
             liquidlevel_bottle = float(self.get(SENSOR3))
             print("PLC3 - get liquidlevel_bottle (SENSOR 3): %i" % liquidlevel_bottle)
@@ -55,14 +55,17 @@ class FPPLC3(PLC):
                 self.send(SENSOR3, liquidlevel_bottle, PLC3_ADDR)
                 try:
                     req = requests.get(
-                        f"http://{SERVER_ADDR}:{PORT}/set_value/{SENSOR3[0]}/{liquidlevel_bottle}"
+                        f"http://{SERVER_ADDR}:{PORT}/set_value/{SENSOR3[0]}/{liquidlevel_bottle}",
+                        timeout=0.1,
                     )
 
                     if req.text == "success":
                         pass
                     else:
                         print("PLC2 - failed to update server DDOS attacker detected")
-                        logging.error("PLC3 - failed to update server DDOS attacker detected")
+                        logging.error(
+                            "PLC3 - failed to update server DDOS attacker detected"
+                        )
                         exit(1)
 
                 except Exception as e:
@@ -77,7 +80,7 @@ class FPPLC3(PLC):
                     "Internal ENIP tag (SENSOR 3) updated: %.2f" % (liquidlevel_bottle)
                 )
             except:
-                logging.info("Could not update internal ENIP tag (SENSOR 3)")
+                logging.error("Could not update internal ENIP tag (SENSOR 3)")
 
             time.sleep(PLC_PERIOD_SEC)  # sleep for .5 seconds
             count += 1

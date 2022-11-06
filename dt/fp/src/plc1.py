@@ -113,13 +113,14 @@ class FPPLC1(PLC):
             try:
                 flowlevel = float(
                     requests.get(
-                        f"http://{SERVER_ADDR}:{PORT}/get_value/{SENSOR2_2[0]}"
+                        f"http://{SERVER_ADDR}:{PORT}/get_value/{SENSOR2_2[0]}",
+                        timeout=0.1,
                     ).text
                 )
 
                 print(
-                    "DEBUG PLC1 - receive liquid level of bottle (SENSOR 3): %f"
-                    % liquidlevel_bottle
+                    "DEBUG PLC2 - receive liquid level of flow (SENSOR 2): %f"
+                    % flowlevel
                 )
 
                 print("DEBUG PLC1 - receive flowlevel (SENSOR 2): %f" % flowlevel)
@@ -151,11 +152,11 @@ class FPPLC1(PLC):
             try:
                 liquidlevel_bottle = float(
                     requests.get(
-                        f"http://{SERVER_ADDR}:{PORT}/get_value/{SENSOR3_3[0]}"
+                        f"http://{SERVER_ADDR}:{PORT}/get_value/{SENSOR3_3[0]}",
+                        timeout=0.1,
                     ).text
                 )
-                
-                
+
                 print(
                     "DEBUG PLC1 - receive liquid level of bottle (SENSOR 3): %f"
                     % liquidlevel_bottle

@@ -13,6 +13,8 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@48,400,0,0" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 </head>
@@ -80,22 +82,22 @@
         </aside>
 
         <main>
-            <h1>Dashboard</h1>
+            <h1>System Terminal</h1>
 
             <div class="insights">
                 <div class="network">
-                    <span class="material-symbols-outlined">
-                        speed
+                    <span class="material-symbols-sharp">
+                        done_all
                     </span>
                     <div class="middle">
                         <div class="left">
-                            <h3>NETWORK ATTACKS</h3>
+                            <h3>SUCESSFULL</h3>
                             <div class="value-container">
                                 <div class="fixed">
                                     <h1>1,537 </h1>
                                 </div>
                                 <div class="flex-item">
-                                    <small class="text-muted">Detected</small>
+                                    <small class="text-muted">Commands</small>
                                 </div>
                             </div>
                         </div>
@@ -109,7 +111,7 @@
                             <svg class="round" viewbox="0 0 85 85" width="100" height="100" data-percent="50">
                                 <circle cx="40" cy="40" r="36" />
                             </svg>
-                            
+
                             <script>
                                 $(document).ready(function () {
                                     var $round = $('.round'),
@@ -130,17 +132,17 @@
                 <!-- end of Dos Attack -->
                 <div class="injection">
                     <span class="material-symbols-outlined">
-                        vaccines
+                        sync
                     </span>
                     <div class="middle">
                         <div class="left">
-                            <h3>INJECTION</h3>
+                            <h3>IN PROGRESS</h3>
                             <div class="value-container">
                                 <div class="fixed">
                                     <h1>1,537 </h1>
                                 </div>
                                 <div class="flex-item">
-                                    <small class="text-muted">Detected</small>
+                                    <small class="text-muted">Commands</small>
                                 </div>
                             </div>
                         </div>
@@ -153,7 +155,7 @@
                             <svg class="round" viewbox="0 0 85 85" width="100" height="100" data-percent="50">
                                 <circle cx="40" cy="40" r="36" />
                             </svg>
-                            
+
                             <script>
                                 $(document).ready(function () {
                                     var $round = $('.round'),
@@ -173,18 +175,18 @@
                 <!-- end of Injections -->
                 <div class="server">
                     <span class="material-symbols-outlined">
-                        dns
+                        error
                     </span>
                     <div class="middle">
                         <div class="left">
-                            <h3>SERVER FAILURE</h3>
+                            <h3>FAILED TO EXECUTE</h3>
 
                             <div class="value-container">
                                 <div class="fixed">
                                     <h1>1,537 </h1>
                                 </div>
                                 <div class="flex-item">
-                                    <small class="text-muted">Detected</small>
+                                    <small class="text-muted">Commands</small>
                                 </div>
                             </div>
 
@@ -198,7 +200,7 @@
                             <svg class="round" viewbox="0 0 85 85" width="100" height="100" data-percent="50">
                                 <circle cx="40" cy="40" r="36" />
                             </svg>
-                            
+
                             <script>
                                 $(document).ready(function () {
                                     var $round = $('.round'),
@@ -223,14 +225,24 @@
             <!-- end of insights -->
 
             <div class="recent-updates">
-                <h2>Real time logs</h2>
-                <table id="plc_logs_table">
-                    <!-- we gonna generate the table using js for now -->
-                    <!-- some magic -->
-                </table>
-                <script src="./index.js" defer></script>
+                <h2>Command execution portal</h2>
+
+                <form action="">
+                    <div class="row">
+
+                        <div class="command">
+                            <textarea class="text" name="text" placeholder="Your friendly bash terminal.."></textarea>
+                        </div>
+                    </div>
+
+                </form>
 
             </div>
+            <div class="row">
+                <input type="submit" value="Execute">
+            </div>
+
+
         </main>
         <!-- end of main  -->
 

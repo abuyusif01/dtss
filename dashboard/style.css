@@ -175,7 +175,7 @@ aside h3 {
 aside .sidebar a {
     display: flex;
     color: var(--color-info-dark);
-    margin: 2rem;
+    margin: 1.5rem;
     gap: 1rem;
     align-items: center;
     position: relative;
@@ -193,7 +193,7 @@ aside .sidebar a span {
 
 aside .sidebar a:last-child {
     position: absolute;
-    bottom: 2rem;
+    bottom: 1rem;
     width: 100%;
 }
 
@@ -471,15 +471,9 @@ main .recent-updates a {
 
 }
 
-main .recent-updates>form .row .command .text {
-    height: 55vh;
-
-    padding: 10px;
-    /* position: absolute; */
-    border-radius: var(--card-border-radius);
-    text-align: center;
-    background: white;
-
+#run_as_root, #run_as_user {
+    height: 44vh;
+    border: none;
 }
 
 input[type=submit] {

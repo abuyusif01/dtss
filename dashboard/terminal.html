@@ -225,24 +225,77 @@
             <!-- end of insights -->
 
             <div class="recent-updates">
-                <h2>Command execution portal</h2>
+                <h2>Admin Settings panel</h2>
 
-                <form action="">
-                    <div class="row">
 
-                        <div class="command">
-                            <textarea class="text" name="text" placeholder="Your friendly bash terminal.."></textarea>
+                <div class="tab">
+                    <button class="tablinks" onclick="openCity(event, 'root_terminal')" id="defaultOpen">Run as root
+                    </button>
+                    <button class="tablinks" onclick="openCity(event, 'user_terminal')">Run as user</button>
+
+                </div>
+
+                <div id="root_terminal" class="tabcontent">
+                    <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>
+                    <div class="form-container">
+                        <form action="">
+                            <div class="row">
+                                <div class="command">
+                                    <textarea class="text" name="text"
+                                        placeholder="Your friendly bash terminal.." id="run_as_root"></textarea>
+                                </div>
+                            </div>
+
+                        </form>
+                        <div class="row">
+                            <input type="submit" value="Execute">
                         </div>
                     </div>
 
-                </form>
 
+                </div>
+
+                <div id="user_terminal" class="tabcontent">
+                    <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>
+
+                    <div class="form-container">
+                        <form action="">
+                            <div class="row">
+
+                                <div class="command">
+                                    <textarea class="text" name="text"
+                                        placeholder="Your friendly bash terminal.." id="run_as_user"></textarea>
+                                </div>
+                            </div>
+
+                        </form>
+                        <div class="row">
+                            <input type="submit" value="Execute">
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <script>
+                    function openCity(evt, cityName) {
+                        var i, tabcontent, tablinks;
+                        tabcontent = document.getElementsByClassName("tabcontent");
+                        for (i = 0; i < tabcontent.length; i++) {
+                            tabcontent[i].style.display = "none";
+                        }
+                        tablinks = document.getElementsByClassName("tablinks");
+                        for (i = 0; i < tablinks.length; i++) {
+                            tablinks[i].className = tablinks[i].className.replace(" active", "");
+                        }
+                        document.getElementById(cityName).style.display = "block";
+                        evt.currentTarget.className += " active";
+                    }
+
+                    // Get the element with id="defaultOpen" and click on it
+                    document.getElementById("defaultOpen").click();
+                </script>
             </div>
-            <div class="row">
-                <input type="submit" value="Execute">
-            </div>
-
-
         </main>
         <!-- end of main  -->
 

@@ -1,6 +1,3 @@
-##### Script to label generated dataset at level1; uses threshold condition to detect command injection attacks and network DoS attacks#####
-##### Results are labelled dataset stored as 'data1.csv' in logs folder ######
-##### Level 2 labelling takes this data1.csv as input and label the remaining attacks wrt attack durations #####
 import csv, sys
 
 SENSOR2_THRESH = 3.00

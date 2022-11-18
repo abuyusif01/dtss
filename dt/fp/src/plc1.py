@@ -3,9 +3,22 @@ FP plc1.py
 """
 
 from minicps.devices import PLC
-from utils import PLC1_DATA, PLC1_PROTOCOL, PLC1_ADDR, PORT, SERVER_ADDR, STATE
-from utils import PLC_PERIOD_SEC
-from utils import TANK_M, BOTTLE_M, SENSOR2_THRESH
+from utils import (
+    CPPPO_PORT,
+    PLC1_DATA,
+    PLC1_PROTOCOL,
+    PLC1_ADDR,
+    PLC2_ADDR,
+    PLC3_ADDR,
+    PORT,
+    SERVER_ADDR,
+    STATE,
+    PLC_PERIOD_SEC,
+    TANK_M,
+    BOTTLE_M,
+    SENSOR2_THRESH,
+)
+
 import time
 import logging
 import csv
@@ -14,14 +27,14 @@ import requests
 import os
 
 # tag addresses
-SENSOR1 = ("SENSOR1-LL-tank", 1)
+SENSOR1 = ("SENSOR1-LL-TANK", 1)
 ACTUATOR1 = ("ACTUATOR1-MV", 1)
 
 # interlocks to plc2 and plc3
 SENSOR2_1 = ("SENSOR2-FL", 1)  # to be sent to PLC2
 SENSOR2_2 = ("SENSOR2-FL", 2)  # to be received from PLC2
-SENSOR3_1 = ("SENSOR3-LL-bottle", 1)  # to be sent to PLC3
-SENSOR3_3 = ("SENSOR3-LL-bottle", 3)  # to be received from PLC3
+SENSOR3_1 = ("SENSOR3-LL-BOTTLE", 1)  # to be sent to PLC3
+SENSOR3_3 = ("SENSOR3-LL-BOTTLE", 3)  # to be received from PLC3
 
 
 class FPPLC1(PLC):
@@ -37,7 +50,7 @@ class FPPLC1(PLC):
 
         time.sleep(sleep)
 
-        # setup logger for plc1
+    # setup logger for plc1
     def setup_logger(self, name, log_file, level=logging.INFO):
         handler = logging.FileHandler(log_file)
         handler.setFormatter(self.formatter)
@@ -46,10 +59,39 @@ class FPPLC1(PLC):
         logger.addHandler(handler)
         return logger
 
+    def api_log(self, _timestamp, _from, _to, _label, _port, _value):
+        """The api_log is what we gonna be reading from the server to generate the dashboard logs table"""
+        with open("API_LOGS/api_log.csv", "a") as writeobj:
+            fieldnames = [
+                "timestamp",
+                "from",
+                "to",
+                "label",
+                "port",
+                "value",
+            ]
+            csv_writer = csv.DictWriter(writeobj, fieldnames=fieldnames)
+
+            csv_writer.writerow(
+                {
+                    "timestamp": _timestamp,
+                    "from": _from,
+                    "to": _to,
+                    "label": _label,
+                    "port": _port,
+                    "value": _value,
+                }
+            )
+
     def store_values(
-        self, liquidlevel_tank, flowlevel, liquidlevel_bottle, motor_status, count
+        self,
+        liquidlevel_tank,
+        flowlevel,
+        liquidlevel_bottle,
+        motor_status,
+        count,
     ):
-        with open("logs/data_.csv", "a") as writeobj:
+        with open("API_LOGS/measurements.csv", "a") as writeobj:
             fieldnames = [
                 "timestamp",
                 "tank_liquidlevel",
@@ -113,7 +155,19 @@ class FPPLC1(PLC):
                 )
 
                 self.set(ACTUATOR1, 0)  # CLOSE actuator mv
-                self.send(ACTUATOR1, 0, PLC1_ADDR)  # send the value to plc1
+                try:
+
+                    self.send(ACTUATOR1, 0, PLC1_ADDR)  # send the value to plc1
+                    self.api_log(
+                        str(datetime.datetime.now()),
+                        PLC1_ADDR,
+                        "SELF",
+                        "ACTUATOR1-MV",
+                        CPPPO_PORT,
+                        "CLOSE",
+                    )
+                except:
+                    pass
 
             # read from PLC2
             try:
@@ -129,8 +183,36 @@ class FPPLC1(PLC):
                     % flowlevel
                 )
 
+                self.api_log(
+                    str(datetime.datetime.now()),
+                    PLC2_ADDR,
+                    PLC1_ADDR,
+                    "SENSOR2-FL",
+                    PORT,
+                    flowlevel,
+                )
+
                 print("DEBUG PLC1 - receive flowlevel (SENSOR 2): %f" % flowlevel)
-                self.send(SENSOR2_1, flowlevel, PLC1_ADDR)
+
+                try:
+                    self.send(SENSOR2_1, flowlevel, PLC1_ADDR)
+                    self.api_log(
+                        str(datetime.datetime.now()),
+                        PLC1_ADDR,
+                        PLC2_ADDR,
+                        "SENSOR2-FL",
+                        CPPPO_PORT,
+                        flowlevel,
+                    )
+                except:
+                    self.api_log(
+                        str(datetime.datetime.now()),
+                        PLC1_ADDR,
+                        PLC2_ADDR,
+                        "SENSOR2-FL",
+                        CPPPO_PORT,
+                        "None",
+                    )
 
                 if flowlevel >= SENSOR2_THRESH:
                     print(
@@ -142,19 +224,41 @@ class FPPLC1(PLC):
                         % (flowlevel, SENSOR2_THRESH)
                     )
                     self.set(ACTUATOR1, 0)  # CLOSE actuator mv
-                    self.send(ACTUATOR1, 0, PLC1_ADDR)
+
+                    try:
+                        self.send(ACTUATOR1, 0, PLC1_ADDR)  # send the value to plc1
+                        self.api_log(
+                            str(datetime.datetime.now()),
+                            PLC1_ADDR,
+                            "SELF",
+                            "ACTUATOR1-MV",
+                            CPPPO_PORT,
+                            "CLOSE",
+                        )
+                    except:
+                        pass
+
                 else:
                     logger.info(
                         "Flow level (SENSOR 2) under SENSOR2_THRESH:  %.2f < %.2f -> leave mv status (ACTUATOR 1)."
                         % (flowlevel, SENSOR2_THRESH)
                     )
-            except:
+            except Exception as e:
                 logger.warning(
                     "Flow level (SENSOR 2) is not received. Program is unable to proceed properly"
                 )
+                self.api_log(
+                    str(datetime.datetime.now()),
+                    PLC2_ADDR,
+                    PLC1_ADDR,
+                    "SENSOR2-FL",
+                    PORT,
+                    "None",
+                )
+
                 flowlevel = 999
 
-            # read from PLC3
+            # read from PLC3 then update
             try:
                 liquidlevel_bottle = float(
                     requests.get(
@@ -167,7 +271,36 @@ class FPPLC1(PLC):
                     "DEBUG PLC1 - receive liquid level of bottle (SENSOR 3): %f"
                     % liquidlevel_bottle
                 )
-                self.send(SENSOR3_1, liquidlevel_bottle, PLC1_ADDR)
+                self.api_log(
+                    str(datetime.datetime.now()),
+                    PLC3_ADDR,
+                    PLC1_ADDR,
+                    "SENSOR3-BL",
+                    PORT,
+                    liquidlevel_bottle,
+                )
+
+                # simulating sending to PLC3 (updating the value in the db)
+                try:
+                    self.send(SENSOR3_1, liquidlevel_bottle, PLC1_ADDR)
+                    self.api_log(
+                        str(datetime.datetime.now()),
+                        PLC1_ADDR,
+                        PLC3_ADDR,
+                        "SENSOR3-BL",
+                        CPPPO_PORT,
+                        liquidlevel_bottle,
+                    )
+
+                except:
+                    self.api_log(
+                        str(datetime.datetime.now()),
+                        PLC1_ADDR,
+                        PLC3_ADDR,
+                        "SENSOR3-BL",
+                        CPPPO_PORT,
+                        "None",
+                    )
 
                 if liquidlevel_bottle >= BOTTLE_M["UpperBound"]:
                     print(
@@ -179,7 +312,20 @@ class FPPLC1(PLC):
                         % (liquidlevel_bottle, BOTTLE_M["UpperBound"])
                     )
                     self.set(ACTUATOR1, 0)  # CLOSE actuator mv
-                    self.send(ACTUATOR1, 0, PLC1_ADDR)
+                    try:
+
+                        self.send(ACTUATOR1, 0, PLC1_ADDR)  # send the value to plc1
+
+                        self.api_log(
+                            str(datetime.datetime.now()),
+                            PLC1_ADDR,
+                            "SELF",
+                            "ACTUATOR1-MV",
+                            CPPPO_PORT,
+                            "CLOSE",
+                        )
+                    except:
+                        pass
 
                 elif (
                     liquidlevel_bottle < BOTTLE_M["UpperBound"]
@@ -194,10 +340,19 @@ class FPPLC1(PLC):
                         % (liquidlevel_bottle, BOTTLE_M["UpperBound"])
                     )
                     self.set(ACTUATOR1, 1)  # OPEN actuator mv
+
+                    self.api_log(
+                        str(datetime.datetime.now()),
+                        PLC3_ADDR,
+                        PLC1_ADDR,
+                        "ACTUATOR1-MV",
+                        CPPPO_PORT,
+                        "OPEN",
+                    )
                     self.send(ACTUATOR1, 1, PLC1_ADDR)
-            except:
+            except Exception as e:
                 logger.warning(
-                    "Liquid level (SENSOR 3) is not received. Program is unable to proceed properly"
+                    "Liquid level (SENSOR 3) is not received. Program is unable to proceed properly", e
                 )
                 liquidlevel_bottle = 999
             motor_status = int(self.get(ACTUATOR1))

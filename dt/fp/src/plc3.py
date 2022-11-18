@@ -6,17 +6,22 @@ from queue import LifoQueue
 from minicps.devices import PLC
 from utils import PLC3_DATA, PORT, SERVER_ADDR, STATE
 from utils import PLC3_PROTOCOL, PLC3_ADDR
-from utils import PLC_PERIOD_SEC, PLC_SAMPLES
+from utils import PLC_PERIOD_SEC
 
 import time
 import logging
 import requests
 
 
-SENSOR3 = ("SENSOR3-LL-bottle", 3)
+SENSOR3 = ("SENSOR3-LL-BOTTLE", 3)
 
 
 class FPPLC3(PLC):
+
+    formatter = logging.Formatter(
+        "%(levelname)s %(asctime)s " + PLC3_ADDR + " %(funcName)s %(message)s",
+        "%Y-%m-%d %H:%M:%S",
+    )
 
     # boot process
     def pre_loop(self):
@@ -25,7 +30,7 @@ class FPPLC3(PLC):
         # wait for the other plcs
         time.sleep(PLC_PERIOD_SEC)
 
-        # setup logger for plc2
+    # setup logger for plc2
     def setup_logger(self, name, log_file, level=logging.INFO):
         handler = logging.FileHandler(log_file)
         handler.setFormatter(self.formatter)
@@ -81,7 +86,7 @@ class FPPLC3(PLC):
                     "Internal ENIP tag (SENSOR 3) updated: %.2f" % (liquidlevel_bottle)
                 )
             except:
-                logging.error("Could not update internal ENIP tag (SENSOR 3)")
+                logger.error("Could not update internal ENIP tag (SENSOR 3)")
 
             time.sleep(PLC_PERIOD_SEC)  # sleep for .5 seconds
             count += 1

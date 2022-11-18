@@ -18,7 +18,7 @@ import time
 
 ACTUATOR1 = ("ACTUATOR1-MV", 1)
 SENSOR2 = ("SENSOR2-FL", 2)
-SENSOR3 = ("SENSOR3-LL-bottle", 3)
+SENSOR3 = ("SENSOR3-LL-BOTTLE", 3)
 
 
 class Bottle(Tank):

@@ -18,6 +18,7 @@ let var_events_hightlight = document.getElementById("events_hightlight");
 let var_plc_logs = document.getElementById("plc_logs_table");
 
 
+const host = 'http://localhost:3000';
 const date = new Date()
 const table_row_count = 13
 const update_row_count = 7
@@ -48,6 +49,17 @@ function gen_plc_logs(table) {
     bytes.innerHTML = Math.floor((Math.random() * 9000) + 1000)
     port.innerHTML = ports[Math.floor((Math.random() * 4))]
     status.innerHTML = plc_status[Math.floor((Math.random() * 3))]
+
+}
+
+// get plc log from api
+function get_plc_logs() {
+    fetch(`${host}/plc_logs`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+            generateTable(var_plc_logs, data)
+        })
 
 }
 
@@ -129,5 +141,5 @@ function gen_update(id, name, time, range, msg, img) {
 
 }
 for (i = 0; i < update_row_count; i++)
-    gen_update("updates", names[Math.floor((Math.random() * 4))], time[Math.floor((Math.random() * 8))], 
-    ranges[Math.floor((Math.random() * 3))], "Updated PLC Tag", "profile-1.jpg")
+    gen_update("updates", names[Math.floor((Math.random() * 4))], time[Math.floor((Math.random() * 8))],
+        ranges[Math.floor((Math.random() * 3))], "Updated PLC Tag", "profile-1.jpg")

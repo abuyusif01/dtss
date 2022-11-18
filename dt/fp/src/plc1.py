@@ -26,12 +26,25 @@ SENSOR3_3 = ("SENSOR3-LL-bottle", 3)  # to be received from PLC3
 
 class FPPLC1(PLC):
 
+    formatter = logging.Formatter(
+        "%(levelname)s %(asctime)s " + PLC1_ADDR + " %(funcName)s %(message)s",
+        "%Y-%m-%d %H:%M:%S",
+    )
     # boot process
     def pre_loop(self, sleep=0.5):
         print("DEBUG: FP PLC1 enters pre_loop")
         print()
 
         time.sleep(sleep)
+
+        # setup logger for plc1
+    def setup_logger(self, name, log_file, level=logging.INFO):
+        handler = logging.FileHandler(log_file)
+        handler.setFormatter(self.formatter)
+        logger = logging.getLogger(name)
+        logger.setLevel(level)
+        logger.addHandler(handler)
+        return logger
 
     def store_values(
         self, liquidlevel_tank, flowlevel, liquidlevel_bottle, motor_status, count
@@ -69,15 +82,7 @@ class FPPLC1(PLC):
 
         print("DEBUG: FP PLC1 enters main_loop.")
         print()
-        # FYI: BSD-syslog format (RFC 3164), e.g. <133>Feb 25 14:09:07 webserver syslogd: restart   PRI <Facility*8+Severity>, HEADER (timestamp host), MSG (program/process message)
-        logging.basicConfig(
-            filename="logs/plc1.log",
-            format="%(levelname)s %(asctime)s "
-            + PLC1_ADDR
-            + " %(funcName)s %(message)s",
-            datefmt="%m/%d/%Y %H:%M:%S",
-            level=logging.DEBUG,
-        )
+        logger = self.setup_logger("local_logger", "logs/plc1.log")
 
         count = 0
         while True:
@@ -102,10 +107,11 @@ class FPPLC1(PLC):
                     "INFO PLC1 - liquid level of tank (SENSOR 1) under LowerBound: %.2f <= %.2f -> close mv (ACTUATOR 1)."
                     % (liquidlevel_tank, TANK_M["LowerBound"])
                 )
-                logging.info(
+                logger.info(
                     "Liquid level of tank (SENSOR 1) under LowerBound: %.2f <= %.2f -> close mv (ACTUATOR 1)."
                     % (liquidlevel_tank, TANK_M["LowerBound"])
                 )
+
                 self.set(ACTUATOR1, 0)  # CLOSE actuator mv
                 self.send(ACTUATOR1, 0, PLC1_ADDR)  # send the value to plc1
 
@@ -131,19 +137,19 @@ class FPPLC1(PLC):
                         "INFO PLC1 - Flow level (SENSOR 2) over SENSOR2_THRESH:  %.2f >= %.2f -> close mv (ACTUATOR 1)."
                         % (flowlevel, SENSOR2_THRESH)
                     )
-                    logging.info(
+                    logger.info(
                         "Flow level (SENSOR 2) over SENSOR2_THRESH:  %.2f >= %.2f -> close mv (ACTUATOR 1)."
                         % (flowlevel, SENSOR2_THRESH)
                     )
                     self.set(ACTUATOR1, 0)  # CLOSE actuator mv
                     self.send(ACTUATOR1, 0, PLC1_ADDR)
                 else:
-                    logging.info(
+                    logger.info(
                         "Flow level (SENSOR 2) under SENSOR2_THRESH:  %.2f < %.2f -> leave mv status (ACTUATOR 1)."
                         % (flowlevel, SENSOR2_THRESH)
                     )
             except:
-                logging.warning(
+                logger.warning(
                     "Flow level (SENSOR 2) is not received. Program is unable to proceed properly"
                 )
                 flowlevel = 999
@@ -168,7 +174,7 @@ class FPPLC1(PLC):
                         "INFO PLC1 - Liquid level (SENSOR 3) over BOTTLE_M['UpperBound']:  %.2f >= %.2f -> close mv (ACTUATOR 1)."
                         % (liquidlevel_bottle, BOTTLE_M["UpperBound"])
                     )
-                    logging.info(
+                    logger.info(
                         "Liquid level (SENSOR 3) over BOTTLE_M['UpperBound']:  %.2f >= %.2f -> close mv (ACTUATOR 1)."
                         % (liquidlevel_bottle, BOTTLE_M["UpperBound"])
                     )
@@ -183,14 +189,14 @@ class FPPLC1(PLC):
                         "INFO PLC1 - Liquid level (SENSOR 3) under BOTTLE_M['UpperBound']: %.2f < %.2f ->  open mv (ACTUATOR 1)."
                         % (liquidlevel_bottle, BOTTLE_M["UpperBound"])
                     )
-                    logging.info(
+                    logger.info(
                         "Liquid level (SENSOR 3) under BOTTLE_M['UpperBound']: %.2f < %.2f -> open mv (ACTUATOR 1)."
                         % (liquidlevel_bottle, BOTTLE_M["UpperBound"])
                     )
                     self.set(ACTUATOR1, 1)  # OPEN actuator mv
                     self.send(ACTUATOR1, 1, PLC1_ADDR)
             except:
-                logging.warning(
+                logger.warning(
                     "Liquid level (SENSOR 3) is not received. Program is unable to proceed properly"
                 )
                 liquidlevel_bottle = 999

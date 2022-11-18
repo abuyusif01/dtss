@@ -25,6 +25,15 @@ class FPPLC3(PLC):
         # wait for the other plcs
         time.sleep(PLC_PERIOD_SEC)
 
+        # setup logger for plc2
+    def setup_logger(self, name, log_file, level=logging.INFO):
+        handler = logging.FileHandler(log_file)
+        handler.setFormatter(self.formatter)
+        logger = logging.getLogger(name)
+        logger.setLevel(level)
+        logger.addHandler(handler)
+        return logger
+
     def main_loop(self):
         """plc3 main loop.
         - read liquid level of bottle (sensor3)
@@ -34,15 +43,7 @@ class FPPLC3(PLC):
         print("DEBUG: FP PLC3 enters main_loop.")
         print
         # FYI: BSD-syslog format (RFC 3164), e.g. <133>Feb 25 14:09:07 webserver syslogd: restart   PRI <Facility*8+Severity>, HEADER (timestamp host), MSG (program/process message)
-        logging.basicConfig(
-            filename="logs/plc3.log",
-            format="%(levelname)s %(asctime)s "
-            + PLC3_ADDR
-            + " %(funcName)s %(message)s",
-            datefmt="%m/%d/%Y %H:%M:%S",
-            level=logging.DEBUG,
-        )
-
+        logger = self.setup_logger("local_logger", "logs/plc3.log")
         count = 0
         # while count <= PLC_SAMPLES:
         while True:
@@ -63,20 +64,20 @@ class FPPLC3(PLC):
                         pass
                     else:
                         print("PLC2 - failed to update server DDOS attacker detected")
-                        logging.error(
+                        logger.error(
                             "PLC3 - failed to update server DDOS attacker detected"
                         )
                         exit(1)
 
                 except Exception as e:
                     print("PLC2 - Exception: %s" % e)
-                    logging.debug("PLC2 - Exception: %s" % e)
+                    logger.debug("PLC2 - Exception: %s" % e)
                     exit(1)
                 print(
                     "DEBUG PLC3 - receive liquidlevel_bottle (SENSOR 3): ",
                     liquidlevel_bottle,
                 )
-                logging.info(
+                logger.info(
                     "Internal ENIP tag (SENSOR 3) updated: %.2f" % (liquidlevel_bottle)
                 )
             except:

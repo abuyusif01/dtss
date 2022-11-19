@@ -74,13 +74,17 @@ function generateTableHead(table, data) {
 
 if (plc_logs_table !== null) {
     generateTableHead(plc_logs_table, plc_data);
-    for (let i = 1; i < 4; i++) {
-        get_status(mhost, mport, mroute, shost, sport, sroute, model_name, plc_logs_table, i)
-        for (let k = 1; k < 5; k++) {
-            get_data(mhost, mport, mroute, plc_logs_table, k)
-        }
 
-    }
+    var count = 0;
+
+    setInterval(() => {
+        let count = 0;
+        // get_status(mhost, mport, mroute, shost, sport, sroute, model_name, plc_logs_table, count);
+        get_data(mhost, mport, mroute, plc_logs_table, count);
+        
+        count += 1;
+        console.log(count)
+    }, 1000);
 
 } else if (events_table !== null) {
     generateTableHead(events_table, event_data);

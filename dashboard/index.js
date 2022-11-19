@@ -1,11 +1,13 @@
-let plc_logs_head = [
+import { get_data, get_status } from './utils.js'
+
+var plc_logs_head = [
     { Timestamp: "", From: "", To: "", Label: "", Port: "", "Byte Count": "", Status: "" },
 
 ];
 
-let events_head = [
+var events_head = [
     { Timestamp: "", Name: "", Role: "", Range: "", Message: "" }
-]
+];
 
 
 let plc_logs_table = document.querySelector("#plc_logs_table");
@@ -18,7 +20,6 @@ let var_events_hightlight = document.getElementById("events_hightlight");
 let var_plc_logs = document.getElementById("plc_logs_table");
 
 
-const host = 'http://localhost:3000';
 const date = new Date()
 const table_row_count = 13
 const update_row_count = 7
@@ -30,38 +31,17 @@ const names = ["Abuyusif01", "Admin", "xyz", "abc", "samha"]
 const time = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 const ranges = ["Days", "Hours", "Minutes", "Seconds"]
 
+const mhost = "localhost"
+const mroute = "get_data"
+const mport = "8000"
+const shost = "localhost"
+const sroute = "get_status"
+const sport = "8001"
+const model_name = "rf"
 
 
-function gen_plc_logs(table) {
-    var row = table.insertRow(1)
-    var timestamp = row.insertCell(0)
-    var from_addr = row.insertCell(1)
-    var to_addr = row.insertCell(2)
-    var label = row.insertCell(3)
-    var port = row.insertCell(4)
-    var bytes = row.insertCell(5)
-    var status = row.insertCell(6)
 
-    timestamp.innerHTML = date
-    from_addr.innerHTML = plc_addr[Math.floor((Math.random() * 6))]
-    to_addr.innerHTML = plc_addr[Math.floor((Math.random() * 6))]
-    label.innerHTML = labels[Math.floor((Math.random() * 4))]
-    bytes.innerHTML = Math.floor((Math.random() * 9000) + 1000)
-    port.innerHTML = ports[Math.floor((Math.random() * 4))]
-    status.innerHTML = plc_status[Math.floor((Math.random() * 3))]
 
-}
-
-// get plc log from api
-function get_plc_logs() {
-    fetch(`${host}/plc_logs`)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data)
-            generateTable(var_plc_logs, data)
-        })
-
-}
 
 function gen_events(table) {
     var row = table.insertRow(1)
@@ -91,23 +71,17 @@ function generateTableHead(table, data) {
     }
 }
 
-function generateTable(table, data) {
-    for (let element of data) {
-        let row = table.insertRow();
-        for (key in element) {
-            let cell = row.insertCell();
-            let text = document.createTextNode(element[key]);
-            cell.appendChild(text);
-        }
-    }
-}
 
 if (plc_logs_table !== null) {
-
     generateTableHead(plc_logs_table, plc_data);
-    for (let i = 0; i < table_row_count; i++) {
-        gen_plc_logs(plc_logs_table)
+    for (let i = 1; i < 4; i++) {
+        get_status(mhost, mport, mroute, shost, sport, sroute, model_name, plc_logs_table, i)
+        for (let k = 1; k < 5; k++) {
+            get_data(mhost, mport, mroute, plc_logs_table, k)
+        }
+
     }
+
 } else if (events_table !== null) {
     generateTableHead(events_table, event_data);
     for (i = 0; i < table_row_count; i++) {
@@ -140,6 +114,6 @@ function gen_update(id, name, time, range, msg, img) {
     document.getElementById(id).appendChild(div)
 
 }
-for (i = 0; i < update_row_count; i++)
-    gen_update("updates", names[Math.floor((Math.random() * 4))], time[Math.floor((Math.random() * 8))],
-        ranges[Math.floor((Math.random() * 3))], "Updated PLC Tag", "profile-1.jpg")
+// for (i = 0; i < update_row_count; i++)
+//     gen_update("updates", names[Math.floor((Math.random() * 4))], time[Math.floor((Math.random() * 8))],
+//         ranges[Math.floor((Math.random() * 3))], "Updated PLC Tag", "profile-1.jpg")

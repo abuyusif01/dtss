@@ -1,10 +1,10 @@
-from flask import (
-    Flask,
-    Response,
-    request,
-)
+from flask import Flask, Response, request
+from flask_cors import CORS
+
 
 app = Flask(__name__)
+
+CORS(app)
 
 
 class Utils:
@@ -21,8 +21,13 @@ class Utils:
 def gen_table() -> Response:
 
     values = request.args.to_dict()
-    line_number = int(values["line_number"])
-    file_name = values["file_name"]
+
+    if len(values) < 2:
+        file_name = "api_log.csv"
+        line_number = 0
+    else:
+        file_name = values["file_name"]
+        line_number = int(values["line_number"])
 
     try:
         """
@@ -34,7 +39,30 @@ def gen_table() -> Response:
         def generate() -> Exception:
             try:
                 with open(file_name, "r") as f:
-                    yield str(Utils.get_lines(f, line_number))[2:-4]
+
+                    temp = str(Utils.get_lines(f, line_number))[2:-4].split(",")
+                    if file_name == "api_log.csv":
+                        yield str(
+                            {
+                                "Timestamp": temp[0],
+                                "From": temp[1],
+                                "To": temp[2],
+                                "Label": temp[3],
+                                "Port": temp[4],
+                                "Value": temp[5],
+                            }
+                        )
+                    else:
+                        yield str(
+                            {
+                                "Timestamp": temp[0],
+                                "tank_liquidlevel": temp[1],
+                                "flowlevel": temp[2],
+                                "bottle_liquidlevel": temp[3],
+                                "motor_status": temp[4],
+                            }
+                        )
+
             except Exception as e:
                 yield str(e)
 

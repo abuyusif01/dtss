@@ -1,8 +1,7 @@
 import { get_data, get_status } from './utils.js'
 
 var plc_logs_head = [
-    { Timestamp: "", From: "", To: "", Label: "", Port: "", "Byte Count": "", Status: "" },
-
+    { Timestamp: "", From: "", To: "", Label: "", Port: "", "Byte Count": "", Status: "" }
 ];
 
 var events_head = [
@@ -40,9 +39,6 @@ const sport = "8001"
 const model_name = "rf"
 
 
-
-
-
 function gen_events(table) {
     var row = table.insertRow(1)
     var timestamp = row.insertCell(0)
@@ -71,17 +67,13 @@ function generateTableHead(table, data) {
     }
 }
 
-
 if (plc_logs_table !== null) {
     generateTableHead(plc_logs_table, plc_data);
 
-    var count = 0;
-
-    setInterval(() => {
+    const x = setInterval(() => {
         let count = 0;
-        // get_status(mhost, mport, mroute, shost, sport, sroute, model_name, plc_logs_table, count);
-        get_data(mhost, mport, mroute, plc_logs_table, count);
-        
+        get_status(mhost, mport, mroute, shost, sport, sroute, model_name, plc_logs_table, count+1);
+        get_data(mhost, mport, mroute, plc_logs_table, Math.floor((Math.random() * 4)));
         count += 1;
         console.log(count)
     }, 1000);

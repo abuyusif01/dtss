@@ -1,7 +1,7 @@
 import { get_data, get_status } from './utils.js'
 
 var plc_logs_head = [
-    { Timestamp: "", From: "", To: "", Label: "", Port: "", "Byte Count": "", Status: "" }
+    { Timestamp: "", From: "", To: "", Label: "", Port: "", Value: "", Status: "" }
 ];
 
 var events_head = [
@@ -9,15 +9,13 @@ var events_head = [
 ];
 
 
-let plc_logs_table = document.querySelector("#plc_logs_table");
-let events_table = document.querySelector("#events_hightlight");
-let recent_update = document.createElement('div')
+const plc_logs_table = document.querySelector("#plc_logs_table");
+const events_table = document.querySelector("#events_hightlight");
+const recent_update = document.createElement('div')
 
-let plc_data = Object.keys(plc_logs_head[0]);
-let event_data = Object.keys(events_head[0]);
-let var_events_hightlight = document.getElementById("events_hightlight");
-let var_plc_logs = document.getElementById("plc_logs_table");
-
+const plc_data = Object.keys(plc_logs_head[0]);
+const event_data = Object.keys(events_head[0]);
+const var_events_hightlight = document.getElementById("events_hightlight");
 
 const date = new Date()
 const table_row_count = 13
@@ -54,7 +52,6 @@ function gen_events(table) {
     msg.innerHTML = "Updated PLC Tag"
 
 }
-// timestamp, fron, to, port, byte size, status
 
 function generateTableHead(table, data) {
     let thead = table.createTHead();
@@ -68,21 +65,58 @@ function generateTableHead(table, data) {
 }
 
 if (plc_logs_table !== null) {
+
+    var get_status_count = 1;
+    var get_data_count = 1;
+    var get_data_cell_number = 0;
+
     generateTableHead(plc_logs_table, plc_data);
 
-    const x = setInterval(() => {
-        let count = 0;
-        get_status(mhost, mport, mroute, shost, sport, sroute, model_name, plc_logs_table, count+1);
-        get_data(mhost, mport, mroute, plc_logs_table, Math.floor((Math.random() * 4)));
-        count += 1;
-        console.log(count)
-    }, 1000);
+    
+    // timeout to update plc logs table is .5 seconds
+    setInterval(() => {
+        /*
+            First row in the dataset is the header
+            omit it and start from the second row
+        */
+        get_status_count < 1
+            ? (get_status_count = 1)
+            : (get_status_count = get_status_count);
+
+        /*
+            Apparently js is all about tricks, there's no clear way of doing things
+            get_status will double request data from Logs API
+            then send that data to ML API and get the status
+        */
+        get_status(mhost,
+            mport,
+            mroute,
+            shost,
+            sport,
+            sroute,
+            model_name,
+            plc_logs_table,
+            parseInt(get_status_count),
+            get_data_cell_number
+        );
+        get_data(mhost, mport, mroute, plc_logs_table, get_data_count);
+        ++get_data_count;
+        ++get_data_cell_number;
+
+        /*
+            This is just a trick to get the accurate data
+            since each row in the measurement represents 4 row in the data
+            we gonna force the data to be 4 times the measurement
+            basically fetching one line in measuremnt == fetching 4 lines in data
+        */
+        get_status_count = get_data_count / 4;
+
+    }, 500);
 
 } else if (events_table !== null) {
     generateTableHead(events_table, event_data);
     for (i = 0; i < table_row_count; i++) {
         gen_events(var_events_hightlight);
-
     }
     var rowCount = document.getElementById('events_hightlight').rows.length;
     document.getElementById('message_count').innerHTML = rowCount - 1;

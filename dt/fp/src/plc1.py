@@ -154,7 +154,7 @@ class FPPLC1(PLC):
                     % (liquidlevel_tank, TANK_M["LowerBound"])
                 )
 
-                self.set(ACTUATOR1, 0)  # CLOSE actuator mv
+                self.set(ACTUATOR1, 0)  # 0 (CLOSE) actuator mv
                 try:
 
                     self.send(ACTUATOR1, 0, PLC1_ADDR)  # send the value to plc1
@@ -164,7 +164,7 @@ class FPPLC1(PLC):
                         "SELF",
                         "ACTUATOR1-MV",
                         CPPPO_PORT,
-                        "CLOSE",
+                        "0 (CLOSE)",
                     )
                 except:
                     pass
@@ -223,7 +223,7 @@ class FPPLC1(PLC):
                         "Flow level (SENSOR 2) over SENSOR2_THRESH:  %.2f >= %.2f -> close mv (ACTUATOR 1)."
                         % (flowlevel, SENSOR2_THRESH)
                     )
-                    self.set(ACTUATOR1, 0)  # CLOSE actuator mv
+                    self.set(ACTUATOR1, 0)  # 0 (CLOSE) actuator mv
 
                     try:
                         self.send(ACTUATOR1, 0, PLC1_ADDR)  # send the value to plc1
@@ -233,7 +233,7 @@ class FPPLC1(PLC):
                             "SELF",
                             "ACTUATOR1-MV",
                             CPPPO_PORT,
-                            "CLOSE",
+                            "0 (CLOSE)",
                         )
                     except:
                         pass
@@ -311,7 +311,7 @@ class FPPLC1(PLC):
                         "Liquid level (SENSOR 3) over BOTTLE_M['UpperBound']:  %.2f >= %.2f -> close mv (ACTUATOR 1)."
                         % (liquidlevel_bottle, BOTTLE_M["UpperBound"])
                     )
-                    self.set(ACTUATOR1, 0)  # CLOSE actuator mv
+                    self.set(ACTUATOR1, 0)  # 0 (CLOSE) actuator mv
                     try:
 
                         self.send(ACTUATOR1, 0, PLC1_ADDR)  # send the value to plc1
@@ -322,7 +322,7 @@ class FPPLC1(PLC):
                             "SELF",
                             "ACTUATOR1-MV",
                             CPPPO_PORT,
-                            "CLOSE",
+                            "0 (CLOSE)",
                         )
                     except:
                         pass
@@ -347,7 +347,7 @@ class FPPLC1(PLC):
                         PLC1_ADDR,
                         "ACTUATOR1-MV",
                         CPPPO_PORT,
-                        "OPEN",
+                        "1 (OPEN)",
                     )
                     self.send(ACTUATOR1, 1, PLC1_ADDR)
             except Exception as e:

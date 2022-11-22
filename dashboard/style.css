@@ -313,7 +313,7 @@ main .insights h3 {
     position: relative;
 }
 
-.round {
+.round-1,  .round-2, .round-3{
     transform: rotate(-90deg);
     transition: all 1s ease-in-out;
     fill: none;

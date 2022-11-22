@@ -97,12 +97,13 @@ if (plc_logs_table !== null) {
             model_name,
             plc_logs_table,
             parseInt(get_status_count),
-            get_data_cell_number
+            get_data_cell_number,
+            get_data_count
         );
         get_data(mhost, mport, mroute, plc_logs_table, get_data_count);
+        
         ++get_data_count;
         ++get_data_cell_number;
-
         /*
             This is just a trick to get the accurate data
             since each row in the measurement represents 4 row in the data
@@ -111,7 +112,7 @@ if (plc_logs_table !== null) {
         */
         get_status_count = get_data_count / 4;
 
-    }, 500);
+    }, 1000);
 
 } else if (events_table !== null) {
     generateTableHead(events_table, event_data);

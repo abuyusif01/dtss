@@ -1,6 +1,21 @@
 const get_data = (host, port, route, table, id) => {
     var data = new XMLHttpRequest();
+
+    /*
+        curl 'http://localhost:8000/get_data?file_name=api_log.csv&line_number=1'
+        Output:
+        {
+            'Timestamp': '2022-11-18 16:51:04.377093', 
+            'From': '10.0.0.1', 
+            'To': '10.0.0.2', 
+            'Label': 'SENSOR2-FL', 
+            'Port': '44818', 
+            'Value': '10.0'
+        }
+
+    */
     data.open("GET", `http://${host}:${port}/${route}?file_name=api_log.csv&line_number=${id}`);
+
     data.send();
 
     data.onreadystatechange = function () {
@@ -12,7 +27,7 @@ const get_data = (host, port, route, table, id) => {
             var label = row.insertCell(3)
             var port = row.insertCell(4)
             var bytes = row.insertCell(5)
-            var status = row.insertCell(6) // even this was never used in this function, we gonna use it in the status function
+            var status = row.insertCell(6) // never used in this function, we gonna use it in the status function
 
             // conver this to json, easier to work with
             var temp = JSON.parse(data.responseText.replaceAll("'", '"'))
@@ -26,22 +41,37 @@ const get_data = (host, port, route, table, id) => {
     }
 }
 
-const get_status = (mhost, mport, mroute, shost, sport, sroute, model_name, table, id) => {
+
+const get_status = (mhost, mport, mroute, shost, sport, sroute, model_name, table, id, count) => {
     var data = new XMLHttpRequest();
     var result = new XMLHttpRequest();
 
+    /*
+        curl 'http://localhost:8000/get_data?file_name=measurements.csv&line_number=1'
+
+        Here is the sample response from the above request
+        {
+            Timestamp: '2022-10-10 16:04:56.160129', 
+            tank_liquidlevel: '5.8', 
+            flowlevel: '0.0', 
+            bottle_liquidlevel: '0.0', 
+            motor_status: '0'
+        }
+    */
     data.open("GET", `http://${mhost}:${mport}/${mroute}?file_name=measurements.csv&line_number=${id}`);
     data.send();
 
     data.onreadystatechange = function () {
         if (data.readyState == 4 && data.status == 200) {
+            var injection_count = parseInt(document.getElementById("injection_hero").innerHTML) + 1;
+            var network_count = parseInt(document.getElementById("network_hero").innerHTML) + 1;
             var control_vars = ["model_name", "tank_liquidlevel", "flowlevel", "bottle_liquidlevel", "motor_status"]
             var temp = JSON.parse(data.responseText.replaceAll("'", '"'))
 
             /*
                 request to the ML API and get the result
                 curl 'http://localhost:8001/get_status?model_name=rf&tank_liquidlevel=5.8&flowlevel=10.0&bottle_liquidlevel=0.0&motor_status=1'
-
+                
                 Here is an example of the response
                 {
                     "result": "Normal"
@@ -50,8 +80,23 @@ const get_status = (mhost, mport, mroute, shost, sport, sroute, model_name, tabl
             result.open("GET", `http://${shost}:${sport}/${sroute}?${control_vars[0]}=${model_name}&${control_vars[1]}=${temp["tank_liquidlevel"]}&${control_vars[2]}=${temp["flowlevel"]}&${control_vars[3]}=${temp["bottle_liquidlevel"]}&${control_vars[4]}=${temp["motor_status"]}`);
             result.send();
 
-            result.onreadystatechange = function () {
+            /*
+                percentage calculation
+                for injection and network
+            */
+            var injection_percent = ((injection_count - 1) / count) * 100
+            isNaN(injection_percent) ? injection_percent = 0 : injection_percent = injection_percent
+
+            var network_percent = ((network_count - 1) / count) * 100
+            isNaN(network_percent) ? network_percent = 0 : network_percent = network_percent
+
+
+            document.getElementById("injection_plabel").innerHTML = injection_percent.toFixed(2) + "%"
+            document.getElementById("network_plabel").innerHTML = network_percent.toFixed(2) + "%"
+
+            result.onreadystatechange = async function () {
                 if (result.readyState == 4 && result.status == 200) {
+
                     var temp = JSON.parse(result.responseText.replaceAll("'", '"'));
                     // update the status column
                     table.rows[1].cells[6].innerHTML = temp["result"];
@@ -72,23 +117,35 @@ const get_status = (mhost, mport, mroute, shost, sport, sroute, model_name, tabl
                             server_hero
                         */
 
-                        // injections box
                         if (temp["result"] == "Command Injection TL" || temp["result"] == "Command Injection TH") {
-                            var x = parseInt(document.getElementById("injection_hero").innerHTML) + 1;
-                            document.getElementById("injection_hero").innerHTML = x
+
+                            /*
+                                we dublicate this code because we need to update the percentage and the hero text
+                                even when the value didnt change
+                                same goes for the network box
+                            */
+                            document.getElementById("injection_hero").innerHTML = injection_count
+                            var percent = (injection_count / count) * 100
+                            percent > 100 ? percent = 100 : percent = percent
+                            document.getElementById("injection_plabel").innerHTML = percent.toFixed(2) + "%"
+
                             // call the api to send admin msg about this attack
                             // calculate the percentage of the box
                             // plot the percentage
                         }
                         else if (temp["result"] == "DoS") {
-                            var x = parseInt(document.getElementById("network_hero").innerHTML) + 1;
-                            document.getElementById("network_hero").innerHTML = x
+                            document.getElementById("network_hero").innerHTML = network_count
+
+                            var percent = (network_count / count) * 100
+                            percent > 100 ? percent = 100 : percent = percent
+                            document.getElementById("network_plabel").innerHTML = percent.toFixed(2) + "%"
+
                         }
                         else if (temp["result"] == "Server Failure") {
                             // this not implemented yet
                             // make a route to ping all the servers and check if they are up
                             // plc1 do this and update it to the log file {need to create an extra column for this}
-        
+
                         }
 
 

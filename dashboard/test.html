@@ -1,0 +1,44 @@
+<div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/meetselva/attrchange@master/js/attrchange.js"></script>
+    <link rel="stylesheet" href="./style.css">
+
+    <p id="aa">
+        70
+    </p>
+    <svg class="round-1" viewbox="0 0 85 85" width="100" height="100" id="round-1">
+        <circle cx="40" cy="40" r="36" />
+    </svg>
+
+
+    <script>
+
+        var $round = $('.round-1')
+        $round.attrchange({
+            trackValues: true,
+            callback: function (event) {
+                console.log(event)
+                roundRadius = $round.find('circle').attr('r');
+                roundPercent = document.getElementById('round-1').getAttribute('data-percent')
+                roundCircum = 2 * roundRadius * Math.PI;
+                roundDraw = roundPercent * roundCircum / 100;
+                $round.css('stroke-dasharray', roundDraw + ' 999');
+                // alert ("changed");
+            }
+        })
+        
+
+        function run(x) {
+            document.getElementById("round-1").setAttribute("data-percent", document.getElementById("aa").innerHTML);
+        }
+        
+        var x = 10;
+        setInterval(() => {
+            run(x);
+            x += 10;
+        }, 500);
+    </script>
+
+
+
+</div>

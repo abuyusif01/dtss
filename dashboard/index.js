@@ -75,6 +75,8 @@ if (plc_logs_table !== null) {
     
     // timeout to update plc logs table is .5 seconds
     setInterval(() => {
+        document.getElementById("round-1").setAttribute("data-percent", "90");
+
         /*
             First row in the dataset is the header
             omit it and start from the second row

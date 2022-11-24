@@ -45,6 +45,7 @@ const get_data = (host, port, route, table, id) => {
 const get_status = (mhost, mport, mroute, shost, sport, sroute, model_name, table, id, count) => {
     var data = new XMLHttpRequest();
     var result = new XMLHttpRequest();
+    var attack_count = 0;
 
     /*
         curl 'http://localhost:8000/get_data?file_name=measurements.csv&line_number=1'
@@ -83,6 +84,9 @@ const get_status = (mhost, mport, mroute, shost, sport, sroute, model_name, tabl
             /*
                 percentage calculation
                 for injection and network
+                injection = (injection_count - 1 / count) * 100
+                -1 because we start with 1, not 0
+
             */
             var injection_percent = ((injection_count - 1) / count) * 100
             isNaN(injection_percent) ? injection_percent = 0 : injection_percent = injection_percent
@@ -90,9 +94,9 @@ const get_status = (mhost, mport, mroute, shost, sport, sroute, model_name, tabl
             var network_percent = ((network_count - 1) / count) * 100
             isNaN(network_percent) ? network_percent = 0 : network_percent = network_percent
 
-
-            document.getElementById("injection_plabel").innerHTML = injection_percent.toFixed(2) + "%"
             document.getElementById("network_plabel").innerHTML = network_percent.toFixed(2) + "%"
+            document.getElementById("injection_plabel").innerHTML = injection_percent.toFixed(2) + "%"
+            
 
             result.onreadystatechange = async function () {
                 if (result.readyState == 4 && result.status == 200) {
@@ -147,11 +151,7 @@ const get_status = (mhost, mport, mroute, shost, sport, sroute, model_name, tabl
                             // plc1 do this and update it to the log file {need to create an extra column for this}
 
                         }
-
-
-
                     }
-
                 }
             }
         }

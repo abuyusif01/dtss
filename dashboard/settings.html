@@ -12,6 +12,7 @@
 
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <script src="https://cdn.jsdelivr.net/gh/meetselva/attrchange@master/js/attrchange.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
@@ -80,7 +81,7 @@
         </aside>
 
         <main>
-            <h1>Settings</h1>
+            <h1>Dashboard</h1>
 
             <div class="insights">
                 <div class="network">
@@ -92,7 +93,7 @@
                             <h3>NETWORK ATTACKS</h3>
                             <div class="value-container">
                                 <div class="fixed">
-                                    <h1>1,537 </h1>
+                                    <h1 id="network_hero">0 </h1>
                                 </div>
                                 <div class="flex-item">
                                     <small class="text-muted">Detected</small>
@@ -102,28 +103,38 @@
 
                         <div class="point">
                             <div class="number">
-                                <p>
-                                    40%
+                                <p id="network_plabel">
+                                    0
                                 </p>
                             </div>
-                            <svg class="round" viewbox="0 0 85 85" width="100" height="100" data-percent="50">
+                            <svg class="round-1" viewbox="0 0 85 85" width="100" height="100" id="round-1">
                                 <circle cx="40" cy="40" r="36" />
                             </svg>
 
                             <script>
-                                $(document).ready(function () {
-                                    var $round = $('.round'),
-                                        roundRadius = $round.find('circle').attr('r'),
-                                        roundPercent = $round.data('percent'),
-                                        roundCircum = 2 * roundRadius * Math.PI,
-                                        roundDraw = roundPercent * roundCircum / 100
-                                    $round.css('stroke-dasharray', roundDraw + ' 999')
 
+                                function run() {
+                                    document.getElementById("round-1").setAttribute("data-percent", parseInt(document.getElementById("network_plabel").innerHTML));
+                                }
+                                setInterval(() => {
+                                    run();
+                                }, 500);
+
+                                var $round = $('.round-1')
+                                $round.attrchange({
+                                    trackValues: true,
+                                    callback: function (event) {
+                                        roundRadius = $round.find('circle').attr('r');
+                                        var x = parseInt(document.getElementById("network_plabel").innerHTML)
+                                        roundPercent = x
+                                        roundCircum = 2 * roundRadius * Math.PI;
+                                        roundDraw = roundPercent * roundCircum / 100;
+                                        $round.css('stroke-dasharray', roundDraw + ' 999');
+                                    }
                                 })
+
                             </script>
                         </div>
-
-
                     </div>
                     <small class="text-muted">Last 24 Hours</small>
                 </div>
@@ -137,7 +148,7 @@
                             <h3>INJECTION</h3>
                             <div class="value-container">
                                 <div class="fixed">
-                                    <h1>1,537 </h1>
+                                    <h1 id="injection_hero">0 </h1>
                                 </div>
                                 <div class="flex-item">
                                     <small class="text-muted">Detected</small>
@@ -146,23 +157,33 @@
                         </div>
                         <div class="point">
                             <div class="number">
-                                <p>
-                                    40%
+                                <p id="injection_plabel">
+                                    0
                                 </p>
                             </div>
-                            <svg class="round" viewbox="0 0 85 85" width="100" height="100" data-percent="50">
+                            <svg class="round-2" viewbox="0 0 85 85" width="100" height="100" id="round-2">
                                 <circle cx="40" cy="40" r="36" />
                             </svg>
 
                             <script>
-                                $(document).ready(function () {
-                                    var $round = $('.round'),
-                                        roundRadius = $round.find('circle').attr('r'),
-                                        roundPercent = $round.data('percent'),
-                                        roundCircum = 2 * roundRadius * Math.PI,
-                                        roundDraw = roundPercent * roundCircum / 100
-                                    $round.css('stroke-dasharray', roundDraw + ' 999')
+                                function run() {
+                                    document.getElementById("round-2").setAttribute("data-percent", parseInt(document.getElementById("injection_plabel").innerHTML));
+                                }
+                                setInterval(() => {
+                                    run();
+                                }, 1000);
 
+                                var $round_2 = $('.round-2')
+                                $round_2.attrchange({
+                                    trackValues: true,
+                                    callback: function (event) {
+                                        roundRadius_2 = $round_2.find('circle').attr('r');
+                                        var value = parseInt(document.getElementById("injection_plabel").innerHTML)
+                                        roundPercent_2 = value
+                                        roundCircum_2 = 2 * roundRadius_2 * Math.PI;
+                                        roundDraw_2 = roundPercent_2 * roundCircum_2 / 100;
+                                        $round_2.css('stroke-dasharray', roundDraw_2 + ' 999');
+                                    }
                                 })
                             </script>
                         </div>
@@ -181,7 +202,7 @@
 
                             <div class="value-container">
                                 <div class="fixed">
-                                    <h1>1,537 </h1>
+                                    <h1 id="server_hero">0 </h1>
                                 </div>
                                 <div class="flex-item">
                                     <small class="text-muted">Detected</small>
@@ -191,17 +212,17 @@
                         </div>
                         <div class="point">
                             <div class="number">
-                                <p>
-                                    40%
+                                <p id="server_plabel">
+                                    0
                                 </p>
                             </div>
-                            <svg class="round" viewbox="0 0 85 85" width="100" height="100" data-percent="50">
+                            <svg class="round-3" viewbox="0 0 85 85" width="100" height="100" id="round-3">
                                 <circle cx="40" cy="40" r="36" />
                             </svg>
 
                             <script>
                                 $(document).ready(function () {
-                                    var $round = $('.round'),
+                                    var $round = $('.round-3'),
                                         roundRadius = $round.find('circle').attr('r'),
                                         roundPercent = $round.data('percent'),
                                         roundCircum = 2 * roundRadius * Math.PI,
@@ -241,7 +262,7 @@
                     <div class="form-container">
                         <form action="action_page.php">
                             <h2>Personal Info</h2>
-                            
+
                             <div class="row">
                                 <div class="col-25">
                                     <label for="fname">Firstname</label>
@@ -327,11 +348,11 @@
 
                 <div id="manage_users" class="tabcontent">
                     <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>
-                    
+
                     <div class="form-container">
                         <form action="action_page.php">
                             <h2>Personal Info</h2>
-                            
+
                             <div class="row">
                                 <div class="col-25">
                                     <label for="fname">Firstname</label>

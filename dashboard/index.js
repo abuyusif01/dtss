@@ -1,4 +1,4 @@
-import { get_data, get_status } from './utils.js'
+import { get_data } from './utils.js'
 
 var plc_logs_head = [
     { Timestamp: "", From: "", To: "", Label: "", Port: "", Value: "", Status: "" }
@@ -28,13 +28,8 @@ const names = ["Abuyusif01", "Admin", "xyz", "abc", "samha"]
 const time = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 const ranges = ["Days", "Hours", "Minutes", "Seconds"]
 
-const mhost = "localhost"
-const mroute = "get_data"
-const mport = "8000"
-const shost = "localhost"
-const sroute = "get_status"
-const sport = "8001"
-const model_name = "rf"
+const host = "localhost"
+const port = "8000"
 
 
 function gen_events(table) {
@@ -66,53 +61,12 @@ function generateTableHead(table, data) {
 
 if (plc_logs_table !== null) {
 
-    var get_status_count = 1;
-    var get_data_count = 1;
-    var get_data_cell_number = 0;
-
+    // Generate Table Head from the template
     generateTableHead(plc_logs_table, plc_data);
 
-    
     // timeout to update plc logs table is .5 seconds
     setInterval(() => {
-        document.getElementById("round-1").setAttribute("data-percent", "90");
-
-        /*
-            First row in the dataset is the header
-            omit it and start from the second row
-        */
-        get_status_count < 1
-            ? (get_status_count = 1)
-            : (get_status_count = get_status_count);
-
-        /*
-            Apparently js is all about tricks, there's no clear way of doing things
-            get_status will double request data from Logs API
-            then send that data to ML API and get the status
-        */
-        get_status(mhost,
-            mport,
-            mroute,
-            shost,
-            sport,
-            sroute,
-            model_name,
-            plc_logs_table,
-            parseInt(get_status_count),
-            get_data_cell_number,
-            get_data_count
-        );
-        get_data(mhost, mport, mroute, plc_logs_table, get_data_count);
-        
-        ++get_data_count;
-        ++get_data_cell_number;
-        /*
-            This is just a trick to get the accurate data
-            since each row in the measurement represents 4 row in the data
-            we gonna force the data to be 4 times the measurement
-            basically fetching one line in measuremnt == fetching 4 lines in data
-        */
-        get_status_count = get_data_count / 4;
+        get_data(host, port, plc_logs_table);
 
     }, 1000);
 

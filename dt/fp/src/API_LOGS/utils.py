@@ -9,6 +9,7 @@ from mysql.connector import Error
 
 SCHEMA = "http"
 
+
 class Utils:
 
     try:
@@ -17,7 +18,7 @@ class Utils:
             user="abuyusif01",
             password="1111",
             database="dtss",
-            autocommit=True, # this will force commit after each query, eg select and update
+            autocommit=True,  # this will force commit after each query, eg select and update
         )
 
         if connection.is_connected():
@@ -95,10 +96,9 @@ if __name__ == "__main__":
     i = 0
     while True:
         df = pd.DataFrame()  # reset dataframe
-        logs = Utils.get_logs("localhost", 8000, "api_log.csv", i)
-        measurements = Utils.get_logs(
-            "localhost", 8000, "measurements.csv", (int(i / 4) + 1)
-        )
+        logs = Utils.get_logs("localhost", 8000, "api_log.csv", 0)
+        measurements = Utils.get_logs("localhost", 8000, "measurements.csv", 0)
+
         status = Utils.get_status(
             "localhost",
             8001,
@@ -124,7 +124,7 @@ if __name__ == "__main__":
 
         i += 1
 
-        time.sleep(1)
+        time.sleep(0.5)
         if df["Status"].iloc[-1] != "Normal":
 
             if (
@@ -162,6 +162,6 @@ if __name__ == "__main__":
         df.to_csv(
             "table.csv",
             index=False,
-            mode="a",
+            mode="w",
             header=not os.path.exists("table.csv"),
         )

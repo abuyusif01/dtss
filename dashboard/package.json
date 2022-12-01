@@ -1,0 +1,18 @@
+{
+  "name": "dtss-login",
+  "version": "1.0.1",
+  "description": "Login page for dtss (Digital Twin Security Solution)",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "abuyusif01",
+  "license": "ISC",
+  "dependencies": {
+    "alert": "^5.0.10",
+    "express": "^4.17.3",
+    "express-session": "^1.17.2",
+    "mysql": "^2.18.1",
+    "popups": "^1.1.3"
+  }
+}

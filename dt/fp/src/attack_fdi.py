@@ -37,7 +37,7 @@ class FPHMI(HMI):
         close_time = time.time() + delay
         while close_time > time.time():
 
-            const_value = 1  # change this to 0 to close valve all the time
+            const_value = 0  # change this to 0 to close valve all the time
             motor_status = int(self.get(ACTUATOR1))
             print("actual motor value: ", motor_status)
 

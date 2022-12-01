@@ -68,7 +68,7 @@ if (plc_logs_table !== null) {
     setInterval(() => {
         get_data(host, port, plc_logs_table);
 
-    }, 1000);
+    }, 500);
 
 } else if (events_table !== null) {
     generateTableHead(events_table, event_data);

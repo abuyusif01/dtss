@@ -93,7 +93,7 @@ class Utils:
 if __name__ == "__main__":
 
     Utils = Utils()
-    i = 0
+    total_count = 0
     while True:
         df = pd.DataFrame()  # reset dataframe
         logs = Utils.get_logs("localhost", 8000, "api_log.csv", 0)
@@ -122,7 +122,11 @@ if __name__ == "__main__":
             ignore_index=True,
         )
 
-        i += 1
+        # total_count = Utils.db_exec("select value from dtss where name = 'Count';")
+        total_count += 1
+        query = f"UPDATE attacks SET value = {total_count} WHERE name = 'Count';"
+        Utils.db_exec(query)
+        Utils.connection.commit()
 
         time.sleep(0.5)
         if df["Status"].iloc[-1] != "Normal":

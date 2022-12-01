@@ -128,16 +128,28 @@ def card_info() -> Response:
     injection_cont = int(
         utils.db_exec("select value from attacks where name='Injection';")[1:-2]
     )
-    total_lines = Utils.get_total_lines("table.csv")
-    network_percent = (network_count / total_lines) * 100
-    injection_percent = (injection_cont / total_lines) * 100
 
+    total_lines = int(
+        utils.db_exec("select value from attacks where name='Count';")[1:-2]
+    )
+    # x = Utils.get_total_lines("table.csv")
+    #  get this from db
+    x = [x if x != 0 else 1 for x in [network_count]]
+    y = [x if x != 0 else 1 for x in [injection_cont]]
+    z = [x if x != 0 else 1 for x in [total_lines]]
+    x = str(x)[1:-1]
+    y = str(y)[1:-1]
+    z = str(z)[1:-1]
+
+    network_percent = (int(x) / int(z)) * 100
+    injection_percent = (int(y) / int(z)) * 100
     return str(
         {
             "network_count": network_count,
             "network_percent": network_percent,
             "injection_count": injection_cont,
             "injection_percent": injection_percent,
+            "total_lines": total_lines,
         }
     )
 

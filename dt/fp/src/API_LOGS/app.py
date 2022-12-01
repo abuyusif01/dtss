@@ -1,7 +1,7 @@
 from flask import Flask, Response, request
 from flask_cors import CORS
 from itertools import takewhile, repeat
-import os
+from utils import Utils as _utils
 
 
 app = Flask(__name__)
@@ -14,6 +14,10 @@ class Utils:
     This certainly not the optimal way to do this, but it works.
     """
 
+    def read_last_line(file_name) -> str:
+        with open(file_name, "r") as f:
+            return f.readlines()[-1]
+
     def get_lines(fp, line_number):
         return [x for i, x in enumerate(fp) if i == line_number]
 
@@ -22,13 +26,42 @@ class Utils:
         bufgen = takewhile(lambda x: x, (f.raw.read(1024 * 1024) for _ in repeat(None)))
         return sum(buf.count(b"\n") for buf in bufgen)
 
-    def exec(command):
-        return os.popen(command).read()
+
+@app.route("/gen_table", methods=["GET"])
+def gen_table() -> Response:
+    try:
+        """
+        since we dont wanna have a broken pipe or typeError
+        we end up using generators to yeild the data as well as
+        safely catch all exceptions
+        """
+        file_name = request.args.get("file_name")
+
+        def generate() -> Exception:
+
+            temp = str(Utils.read_last_line(file_name))[2:-1].split(",")
+            print(temp)
+
+            yield str(
+                {
+                    "Timestamp": temp[0],
+                    "From": temp[1],
+                    "To": temp[2],
+                    "Label": temp[3],
+                    "Port": temp[4],
+                    "Value": temp[5],
+                    "Status": temp[6],
+                }
+            )
+
+    except Exception as e:
+        return e
+    return Response(generate())
 
 
 # take a line number and return the line from the log file
 @app.route("/get_data", methods=["GET"])
-def gen_table() -> Response:
+def get_data() -> Response:
 
     values = request.args.to_dict()
 
@@ -81,15 +114,44 @@ def gen_table() -> Response:
     return Response(generate())
 
 
-# route to execute system commands
-@app.route("/exec", methods=["GET"])
-def exec() -> Response:
-    values = request.args.to_dict()
-    if len(values) < 1:
-        return "No command provided"
-    else:
-        command = values["command"]
-        return Utils.exec(command)
+@app.route("/card_info", methods=["GET"])
+def card_info() -> Response:
+    utils = _utils()
+
+    """
+    get total lines, then calculate how many attacks are there and get percentage
+    number of attacks from db
+    """
+    network_count = int(
+        utils.db_exec("select value from attacks where name='Dos';")[1:-2]
+    )
+    injection_cont = int(
+        utils.db_exec("select value from attacks where name='Injection';")[1:-2]
+    )
+
+    total_lines = int(
+        utils.db_exec("select value from attacks where name='Count';")[1:-2]
+    )
+    # x = Utils.get_total_lines("table.csv")
+    #  get this from db
+    x = [x if x != 0 else 1 for x in [network_count]]
+    y = [x if x != 0 else 1 for x in [injection_cont]]
+    z = [x if x != 0 else 1 for x in [total_lines]]
+    x = str(x)[1:-1]
+    y = str(y)[1:-1]
+    z = str(z)[1:-1]
+
+    network_percent = (int(x) / int(z)) * 100
+    injection_percent = (int(y) / int(z)) * 100
+    return str(
+        {
+            "network_count": network_count,
+            "network_percent": network_percent,
+            "injection_count": injection_cont,
+            "injection_percent": injection_percent,
+            "total_lines": total_lines,
+        }
+    )
 
 
 if __name__ == "__main__":

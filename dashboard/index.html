@@ -114,26 +114,26 @@
                             </svg>
 
                             <script>
-
-                                function run() {
+                                function _run() {
                                     document.getElementById("round-1").setAttribute("data-percent", parseInt(document.getElementById("network_plabel").innerHTML));
                                 }
                                 setInterval(() => {
-                                    run();
-                                }, 500);
+                                    _run();
+                                }, 1000);
 
-                                var $round = $('.round-1')
-                                $round.attrchange({
+                                var $round_1 = $('.round-1')
+                                $round_1.attrchange({
                                     trackValues: true,
                                     callback: function (event) {
-                                        roundRadius = $round.find('circle').attr('r');
-                                        var x = parseInt(document.getElementById("network_plabel").innerHTML)
-                                        roundPercent = x
-                                        roundCircum = 2 * roundRadius * Math.PI;
-                                        roundDraw = roundPercent * roundCircum / 100;
-                                        $round.css('stroke-dasharray', roundDraw + ' 999');
+                                        roundRadius_1 = $round_1.find('circle').attr('r');
+                                        var value = parseInt(document.getElementById("network_plabel").innerHTML)
+                                        roundPercent_1 = value
+                                        roundCircum_1 = 2 * roundRadius_1 * Math.PI;
+                                        roundDraw_1 = roundPercent_1 * roundCircum_1 / 100;
+                                        $round_1.css('stroke-dasharray', roundDraw_1 + ' 999');
                                     }
                                 })
+
 
                             </script>
                         </div>
@@ -168,25 +168,45 @@
                             </svg>
 
                             <script>
+
                                 function run() {
                                     document.getElementById("round-2").setAttribute("data-percent", parseInt(document.getElementById("injection_plabel").innerHTML));
                                 }
                                 setInterval(() => {
                                     run();
-                                }, 1000);
+                                }, 500);
 
-                                var $round_2 = $('.round-2')
-                                $round_2.attrchange({
+                                var $round = $('.round-2')
+                                $round.attrchange({
                                     trackValues: true,
                                     callback: function (event) {
-                                        roundRadius_2 = $round_2.find('circle').attr('r');
-                                        var value = parseInt(document.getElementById("injection_plabel").innerHTML)
-                                        roundPercent_2 = value
-                                        roundCircum_2 = 2 * roundRadius_2 * Math.PI;
-                                        roundDraw_2 = roundPercent_2 * roundCircum_2 / 100;
-                                        $round_2.css('stroke-dasharray', roundDraw_2 + ' 999');
+                                        roundRadius = $round.find('circle').attr('r');
+                                        var x = parseInt(document.getElementById("injection_plabel").innerHTML)
+                                        roundPercent = x
+                                        roundCircum = 2 * roundRadius * Math.PI;
+                                        roundDraw = roundPercent * roundCircum / 100;
+                                        $round.css('stroke-dasharray', roundDraw + ' 999');
                                     }
                                 })
+                            //     function run() {
+                            //         document.getElementById("round-2").setAttribute("data-percent", parseInt(document.getElementById("injection_plabel").innerHTML));
+                            //     }
+                            //     setInterval(() => {
+                            //         run();
+                            //     }, 1000);
+
+                            //     var $round_2 = $('.round-2')
+                            //     $round_2.attrchange({
+                            //         trackValues: true,
+                            //         callback: function (event) {
+                            //             roundRadius_2 = $round_2.find('circle').attr('r');
+                            //             var value = parseInt(document.getElementById("injection_plabel").innerHTML)
+                            //             roundPercent_2 = value
+                            //             roundCircum_2 = 2 * roundRadius_2 * Math.PI;
+                            //             roundDraw_2 = roundPercent_2 * roundCircum_2 / 100;
+                            //             $round_2.css('stroke-dasharray', roundDraw_2 + ' 999');
+                            //         }
+                            //     })
                             </script>
                         </div>
 
@@ -223,15 +243,15 @@
                             </svg>
 
                             <script>
-                                $(document).ready(function () {
-                                    var $round = $('.round-3'),
-                                        roundRadius = $round.find('circle').attr('r'),
-                                        roundPercent = $round.data('percent'),
-                                        roundCircum = 2 * roundRadius * Math.PI,
-                                        roundDraw = roundPercent * roundCircum / 100
-                                    $round.css('stroke-dasharray', roundDraw + ' 999')
+                                // $(document).ready(function () {
+                                //     var $round = $('.round-3'),
+                                //         roundRadius = $round.find('circle').attr('r'),
+                                //         roundPercent = $round.data('percent'),
+                                //         roundCircum = 2 * roundRadius * Math.PI,
+                                //         roundDraw = roundPercent * roundCircum / 100
+                                //     $round.css('stroke-dasharray', roundDraw + ' 999')
 
-                                })
+                                // })
                             </script>
                         </div>
 

@@ -61,7 +61,7 @@ class FPPLC1(PLC):
 
     def api_log(self, _timestamp, _from, _to, _label, _port, _value):
         """The api_log is what we gonna be reading from the server to generate the dashboard logs table"""
-        with open("API_LOGS/api_log.csv", "a") as writeobj:
+        with open("API_LOGS/api_log.csv", "w") as writeobj:
             fieldnames = [
                 "timestamp",
                 "from",
@@ -91,7 +91,7 @@ class FPPLC1(PLC):
         motor_status,
         count,
     ):
-        with open("API_LOGS/measurements.csv", "a") as writeobj:
+        with open("API_LOGS/measurements.csv", "w") as writeobj:
             fieldnames = [
                 "timestamp",
                 "tank_liquidlevel",

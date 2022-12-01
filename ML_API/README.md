@@ -2,43 +2,46 @@
 
 ### 1. Introduction
 
-This API is used to get the predictions from the ML models. The API is built using Flask and the models are built using scikit-learn.
-The folder contains the following files:
+This API is used to get the predictions from the ML models. The API is built
+using Flask and the models are built using scikit-learn. The folder contains the
+following files:
 
 1. app.py - This file contains the code for the API.
 2. train.ipynb - This file contains the code for training the models.
-3. label.py - This file contains the code for the labelling attacks for the training data.
-
+3. label.py - This file contains the code for the labelling attacks for the
+   training data.
 
 ### 2. Installation
 
-This API is built using Python 3.: for installation and running the API, please follow the steps below:
+This API is built using Python 3.10.8: for installation and running the API,
+please follow the steps below:
 
-1. Clone the repository
-2. Create a virtual environment
-3. Install the requirements
-4. Run the API
-
+1. Clone the repository `git clone https://github.com/abuyusif01/dtss`
+2. Create a virtual environment `python3 -m venv ml_api`
+3. Install the requirements `python3 -m pip3 install -r requirements.txt`
+4. Run the API `python app.py`
 
 ### 3. API
 
 The API has 2 endpoints:
 
-1. get_stutus: This end point is used to check the status of Digital Twin state, the route take the following as input parameters:
+1. get_stutus: This end point is used to check the status of Digital Twin state,
+   the route take the following as input parameters:
 
-    - `tank_liquidlevel`: the liquid level of the tank capture by the sensor
-    - `flowlevel`: sensor value for flow level
-    - `bottle_liquidlevel`:  bottle liquid level captured from the sensor
-    - `motor_status`: current status of plc1 motor valve
-    - `model_name`: since we have a total of 5 models, we need to specify which model to use (default rf - random forest)
+   - `tank_liquidlevel`: the liquid level of the tank capture by the sensor
+   - `flowlevel`: sensor value for flow level
+   - `bottle_liquidlevel`: bottle liquid level captured from the sensor
+   - `motor_status`: current status of plc1 motor valve
+   - `model_name`: since we have a total of 5 models, we need to specify which
+     model to use (default rf - random forest)
 
-2. plc_log: This end point take only 1 argument which is a `file name` and return its content as a json object.
-
-
+2. plc_log: This end point take only 1 argument which is a `file name` and
+   return its content as a json object.
 
 ### 4. Models
 
-The models are built using scikit-learn and are saved in the `models` folder. The models are:
+The models are built using scikit-learn and are saved in the `models` folder.
+The models are:
 
 1. `rf`: Random Forest
 2. `stacking`: Stacking
@@ -46,31 +49,32 @@ The models are built using scikit-learn and are saved in the `models` folder. Th
 4. `GB`: Gradient Boosting
 5. `nb`: naive bayes
 
-The models are trained using the `train.ipynb` file and the data is stored in the `models` folder.
-
+The models are trained using the `train.ipynb` file and the data is stored in
+the `models` folder.
 
 ### 5. Usage
 
-
 #### 5.1. get_status
-``` bash
-   
+
+```bash
+
     curl 'http://localhost:8000/get_data?file_name=api_log.csv&line_number=1'
     Output:
     {
-        'Timestamp': '2022-11-18 16:51:04.377093', 
-        'From': '10.0.0.1', 
-        'To': '10.0.0.2', 
-        'Label': 'SENSOR2-FL', 
-        'Port': '44818', 
+        'Timestamp': '2022-11-18 16:51:04.377093',
+        'From': '10.0.0.1',
+        'To': '10.0.0.2',
+        'Label': 'SENSOR2-FL',
+        'Port': '44818',
         'Value': '10.0',
         'Status': 'Normal'
     }
 ```
 
 #### 5.2. plc_log
-``` bash
-   
+
+```bash
+
     curl 'http://localhost:8000/plc_log?name=/etc/passwd'
     Output:
     {
@@ -112,3 +116,4 @@ The models are trained using the `train.ipynb` file and the data is stored in th
         ldap:x:439:439:LDAP Server:/var/lib/openldap:/usr/bin/nologin
     }
 ```
+

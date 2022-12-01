@@ -1,0 +1,7 @@
+pandas
+sklearn
+matplotlib
+numpy
+flask
+flask_cors
+venv

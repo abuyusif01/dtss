@@ -41,36 +41,28 @@ class Utils {
 
   }
 }
+const __static_html = path.join(__dirname, "static").replace(/\\/g, "\\\\") + "/html";
 
 // express config for static files, json and other stuff
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "static")));
+app.use(express.static(path.join(__dirname, "static/html")));
+app.use(express.static(path.join(__dirname, "static/css")));
+app.use(express.static(path.join(__dirname, "static/js")));
 app.use(express.json());
 
 
-
-
-
-// function route_if_logged_else_login(route_name) {
-//   app.get(`${route_name}`, (request, response) => {
-//     if (request.session.loggedin) {
-//       response.sendFile(path.join(__dirname + `${route_name}`));
-//     }
-//     else {
-//       alert("Please login to view this page!");
-//       response.redirect("/");
-//     }
-//   });
-
-// }
 // display login page
 app.get("/", (request, response) => {
 
   // if the user login already, redirect to the dashboard
   if (request.session.loggedin) {
     response.redirect("/dashboard");
-  } else { response.sendFile(path.join(__dirname + "/login.html")); }
+  } else {
+
+    response.sendFile(path.join(__static_html + "/login.html"));
+  }
 
 });
 
@@ -130,61 +122,55 @@ app.get('/userInfo', function (request, response) {
 // get on dashboard
 app.get("/dashboard", (request, response) => {
   if (request.session.loggedin) {
-    response.sendFile(path.join(__dirname + "/index.html"));
+    response.sendFile(path.join(__static_html + "/index.html"));
   }
   else {
-    alert("Please login to view this page!");
-    response.redirect("/");
+    response.sendFile(path.join(__static_html + "/login.html"));
   }
 });
 
 app.get("/terminal", (request, response) => {
   if (request.session.loggedin) {
-    response.sendFile(path.join(__dirname + "/terminal.html"));
+    response.sendFile(path.join(__static_html + "/terminal.html"));
   }
   else {
-    alert("Please login to view this page!");
-    response.redirect("/");
+    response.sendFile(path.join(__static_html + "/login.html"));
   }
 });
 
 app.get("/plc_info", (request, response) => {
   if (request.session.loggedin) {
-    response.sendFile(path.join(__dirname + "/plc_info.html"));
+    response.sendFile(path.join(__static_html + "/plc_info.html"));
   }
   else {
-    alert("Please login to view this page!");
-    response.redirect("/");
+    response.sendFile(path.join(__static_html + "/login.html"));
   }
 });
 
 app.get("/events", (request, response) => {
   if (request.session.loggedin) {
-    response.sendFile(path.join(__dirname + "/events.html"));
+    response.sendFile(path.join(__static_html + "/events.html"));
   }
   else {
-    alert("Please login to view this page!");
-    response.redirect("/");
+    response.sendFile(path.join(__static_html + "/login.html"));
   }
 });
 
 app.get("/about", (request, response) => {
   if (request.session.loggedin) {
-    response.sendFile(path.join(__dirname + "/about.html"));
+    response.sendFile(path.join(__static_html + "/about.html"));
   }
   else {
-    alert("Please login to view this page!");
-    response.redirect("/");
+    response.sendFile(path.join(__static_html + "/login.html"));
   }
 });
 
 app.get("/settings", (request, response) => {
   if (request.session.loggedin) {
-    response.sendFile(path.join(__dirname + "/settings.html"));
+    response.sendFile(path.join(__static_html + "/settings.html"));
   }
   else {
-    alert("Please login to view this page!");
-    response.redirect("/");
+    response.sendFile(path.join(__static_html + "/login.html"));
   }
 });
 

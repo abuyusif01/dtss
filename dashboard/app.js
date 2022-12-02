@@ -29,43 +29,26 @@ app.use(
   })
 );
 
-
-class Utils {
-
-  constructor() {
-    this.connection = connection;
-  }
-
-  assignRole(request, uname) {
-
-
-  }
-}
 const __static_html = path.join(__dirname, "static").replace(/\\/g, "\\\\") + "/html";
+
+app.get("/", (request, response) => {
+  // if the user login already, redirect to the dashboard
+  if (request.session.loggedin) {
+    response.redirect("/dashboard");
+  } else {
+    response.sendFile(path.join(__static_html + "/login.html"));
+
+  }
+
+});
 
 // express config for static files, json and other stuff
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "static")));
-app.use(express.static(path.join(__dirname, "static/html")));
 app.use(express.static(path.join(__dirname, "static/css")));
 app.use(express.static(path.join(__dirname, "static/js")));
 app.use(express.json());
-
-
-// display login page
-app.get("/", (request, response) => {
-
-  // if the user login already, redirect to the dashboard
-  if (request.session.loggedin) {
-    response.redirect("/dashboard");
-  } else {
-
-    response.sendFile(path.join(__static_html + "/login.html"));
-  }
-
-});
-
 
 // login post request
 app.post("/", (request, response) => {
@@ -126,6 +109,8 @@ app.get("/dashboard", (request, response) => {
   }
   else {
     response.sendFile(path.join(__static_html + "/login.html"));
+    alert("Please login to view this page!");
+    response.redirect("/");
   }
 });
 
@@ -134,7 +119,8 @@ app.get("/terminal", (request, response) => {
     response.sendFile(path.join(__static_html + "/terminal.html"));
   }
   else {
-    response.sendFile(path.join(__static_html + "/login.html"));
+    alert("Please login to view this page!");
+    response.redirect("/");
   }
 });
 
@@ -143,7 +129,8 @@ app.get("/plc_info", (request, response) => {
     response.sendFile(path.join(__static_html + "/plc_info.html"));
   }
   else {
-    response.sendFile(path.join(__static_html + "/login.html"));
+    alert("Please login to view this page!");
+    response.redirect("/");
   }
 });
 
@@ -152,7 +139,8 @@ app.get("/events", (request, response) => {
     response.sendFile(path.join(__static_html + "/events.html"));
   }
   else {
-    response.sendFile(path.join(__static_html + "/login.html"));
+    alert("Please login to view this page!");
+    response.redirect("/");
   }
 });
 
@@ -161,7 +149,8 @@ app.get("/about", (request, response) => {
     response.sendFile(path.join(__static_html + "/about.html"));
   }
   else {
-    response.sendFile(path.join(__static_html + "/login.html"));
+    alert("Please login to view this page!");
+    response.redirect("/");
   }
 });
 
@@ -170,10 +159,23 @@ app.get("/settings", (request, response) => {
     response.sendFile(path.join(__static_html + "/settings.html"));
   }
   else {
-    response.sendFile(path.join(__static_html + "/login.html"));
+    alert("Please login to view this page!");
+    response.redirect("/");
   }
 });
 
-
+app.get('*', function (request, response) {
+  let error = `<h2>It appears that you are trying to access a page that doesn't exist. Please try again.
+  below are the availeble pages:
+  <br>
+  /dashboard <br>
+  /terminal <br>
+  /plc_info <br>
+  /events <br>
+  /about <br>
+  /setting </h2>
+  `;
+  response.send(error, 404);
+});
 
 app.listen(port);

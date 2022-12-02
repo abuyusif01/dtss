@@ -69,8 +69,18 @@ function user_info(host, port) {
     req.onreadystatechange = function () {
         if (req.readyState == 4 && req.status == 200) {
             var result = JSON.parse(req.responseText)
-            document.getElementById("name").innerHTML = result["name"].charAt(0).toUpperCase() + result["name"].slice(1);
+            document.getElementById("name").innerHTML = result["fname"].charAt(0).toUpperCase() + result["fname"].slice(1);
             document.getElementById("role").innerHTML = result["role"].charAt(0).toUpperCase() + result["role"].slice(1);
+
+
+            // setting user info for settings
+
+            document.getElementById("fname").value = result["fname"]
+            document.getElementById("lname").value = result["lname"]
+            document.getElementById("email").value = result["email"]
+            document.getElementById("contact_number").value = result["contact"]
+
+            
         }
     }
 }

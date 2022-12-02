@@ -1,10 +1,12 @@
 const port = 5000;
 const mysql = require("mysql");
+const { exec } = require("child_process");
 const alert = require("alert");
 const express = require("express");
 const session = require("express-session");
 const path = require("path");
 const os = require("os");
+const { fail } = require("assert");
 
 os.hostname() === "The-Castle"
   ? (connection = mysql.createConnection({
@@ -113,6 +115,36 @@ app.get('/userInfo', (request, response) => {
 
 })
 
+app.get("/execInfo", (request, response) => {
+
+  if (!request.session.loggedin) {
+    let sql = `SELECT * FROM commands`;
+    connection.query(sql, (err, result) => {
+
+      let success = parseInt(result[0].success);
+      let fail = parseInt(result[0].failed);
+      let pending = parseInt(result[0].pending);
+      let count = parseInt(success + fail + pending).toString();
+      let success_percent = parseInt((success / count) * 100).toString();
+      let failed_percent = parseInt((fail / count) * 100).toString();
+      let pending_percent = parseInt((pending / count) * 100).toString();
+
+      response.json(
+        {
+          success: success,
+          fail: fail,
+          pending: pending,
+          count: count,
+          success_percent: success_percent,
+          failed_percent: failed_percent,
+          pending_percent: pending_percent
+
+        }
+      );
+    });
+  } else { response.json({ error: "403 - Not Authenticated" }); }
+});
+
 
 app.post("/personal_info", (request, response) => {
 
@@ -170,15 +202,74 @@ app.post("/add_users", (request, response) => {
         alert("User added successfully");
       });
     }
-    else {
-      alert("Passwords don't match");
-    }
+    else { alert("Passwords don't match"); }
   }
-  else {
-    alert("Need to be admin first");
-  }
+  else { alert("Need to be admin first"); }
 });
 
+
+app.post("/exec_user", (request, response) => {
+
+  if (!request.session.loggedin) {
+
+    // add the command to pending commands table
+    let sql_pending = `SELECT pending from commands`;
+    connection.query(sql_pending, (err, result) => {
+      let pending = parseInt(result[0].pending);
+      let sql = `UPDATE commands SET pending = '${pending + 1}'`;
+      connection.query(sql, (err, result) => { });
+    });
+
+    let command = request.body.command;
+    try {
+      exec(command, (error, stdout, stderr) => {
+
+        if (error || stderr) {
+          let sql_pending = `SELECT pending from commands`;
+          connection.query(sql_pending, (err, result) => {
+            let _pending = parseInt(result[0].pending);
+            let sql = `UPDATE commands SET pending = '${_pending - 1}'`;
+            connection.query(sql, (err, result) => { });
+          });
+
+          let sql_failed = `SELECT failed from commands`;
+          connection.query(sql_failed, (err, result) => {
+            let _failed = parseInt(result[0].failed);
+            let sql = `UPDATE commands SET failed = '${_failed + 1}'`;
+            connection.query(sql, (err, result) => { });
+          });
+          alert(stderr);
+          response.end();
+        }
+
+        if (stdout) {
+          let sql_pending = `SELECT pending from commands`;
+          connection.query(sql_pending, (err, result) => {
+            let _pending = parseInt(result[0].pending);
+            let sql = `UPDATE commands SET pending = '${_pending - 1}'`;
+            connection.query(sql, (err, result) => { });
+          });
+
+          let sql_success = `SELECT success from commands`;
+          connection.query(sql_success, (err, result) => {
+            let _success = parseInt(result[0].success);
+            let sql = `UPDATE commands SET success = '${_success + 1}'`;
+            connection.query(sql, (err, result) => { });
+          });
+          alert(stdout);
+          response.end();
+        }
+
+      })
+    } catch (error) { response.send(error); response.end() }
+  }
+  else {
+    response.send('<script>alert("Need to login")</script>');
+    response.end();
+  }
+
+
+});
 
 // get on dashboard
 app.get("/dashboard", (request, response) => {

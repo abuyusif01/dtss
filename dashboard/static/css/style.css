@@ -313,7 +313,9 @@ main .insights h3 {
     position: relative;
 }
 
-.round-1,  .round-2, .round-3{
+.round-1,
+.round-2,
+.round-3 {
     transform: rotate(-90deg);
     transition: all 1s ease-in-out;
     fill: none;
@@ -351,7 +353,7 @@ main .recent-updates h2 {
 
 main .recent-updates table {
     background: var(--color-white);
-    width: 100%;    
+    width: 100%;
     border-radius: var(--card-border-radius);
     padding: var(--card-padding);
     text-align: left;
@@ -367,7 +369,7 @@ main .recent-updates table:hover {
 tr td {
     height: 2.6rem;
     color: var(--color-dark-variant);
-    
+
 }
 
 
@@ -574,6 +576,7 @@ textarea {
 
 /* Style inputs, select elements and textareas */
 input[type=text],
+input[type=password],
 select,
 textarea {
     width: 100%;

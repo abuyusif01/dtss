@@ -73,7 +73,7 @@ function user_info(host, port) {
             document.getElementById("role").innerHTML = result["role"].charAt(0).toUpperCase() + result["role"].slice(1);
 
 
-            // setting user info for settings
+            // setting user info for settings too lazy to make a new function
 
             document.getElementById("fname").value = result["fname"]
             document.getElementById("lname").value = result["lname"]

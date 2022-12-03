@@ -1,4 +1,3 @@
-const port = 5000;
 const mysql = require("mysql");
 const { exec } = require("child_process");
 const alert = require("alert");
@@ -6,14 +5,17 @@ const express = require("express");
 const session = require("express-session");
 const path = require("path");
 const os = require("os");
-const { fail } = require("assert");
 
-os.hostname() === "The-Castle"
+const dotenv = require("dotenv");
+dotenv.config();
+
+const port = process.env.PORT || 5000;
+os.hostname() === process.env.LOCALHOST
   ? (connection = mysql.createConnection({
-    host: "127.0.0.1",
-    user: "abuyusif01",
-    password: "1111",
-    database: "dtss",
+    host: process.env.DB_ADDR,
+    user: process.env.USER,
+    password: process.env.DB_PASSWD,
+    database: process.env.DB_NAME,
   }))
   : (connection = mysql.createConnection({
     host: "127.0.0.1",
@@ -41,6 +43,7 @@ app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(__dirname, "static/css")));
 app.use(express.static(path.join(__dirname, "static/js")));
 app.use(express.json());
+
 
 
 app.get("/", (request, response) => {
@@ -181,6 +184,7 @@ app.post("/personal_info", (request, response) => {
 });
 
 
+
 app.post("/add_users", (request, response) => {
   let fname = request.body.fname;
   let lname = request.body.lname;
@@ -189,8 +193,6 @@ app.post("/add_users", (request, response) => {
   let contact = request.body.contact;
   let _password = request.body._password;
   let password = request.body.password;
-
-
 
   // make sure the user is admin
   if (request.session.role === "admin" || request.session.role === "Admin") {
@@ -208,9 +210,20 @@ app.post("/add_users", (request, response) => {
 });
 
 
-app.post("/exec_user", (request, response) => {
+app.post("/exec", (request, response) => {
 
-  if (!request.session.loggedin) {
+  if (request.session.loggedin) {
+    if (request.body._root) {
+      if (request.session.role === "admin" || request.session.role === "Admin") {
+        command = `echo ${process.env.ROOT_PASSWD} | sudo -S ${request.body._root} 0>/dev/null`
+      }
+      else {
+        alert("Only admins are allowd to run commands as root");
+        response.redirect("/terminal");
+        return;
+      }
+    }
+    else { command = request.body._user; }
 
     // add the command to pending commands table
     let sql_pending = `SELECT pending from commands`;
@@ -220,7 +233,6 @@ app.post("/exec_user", (request, response) => {
       connection.query(sql, (err, result) => { });
     });
 
-    let command = request.body.command;
     try {
       exec(command, (error, stdout, stderr) => {
 
@@ -239,6 +251,7 @@ app.post("/exec_user", (request, response) => {
             connection.query(sql, (err, result) => { });
           });
           alert(stderr);
+          response.redirect("/terminal");
           response.end();
         }
 
@@ -257,19 +270,15 @@ app.post("/exec_user", (request, response) => {
             connection.query(sql, (err, result) => { });
           });
           alert(stdout);
+          response.redirect("/terminal");
           response.end();
         }
-
       })
     } catch (error) { response.send(error); response.end() }
   }
-  else {
-    response.send('<script>alert("Need to login")</script>');
-    response.end();
-  }
-
-
+  else { response.redirect("/"); }
 });
+
 
 // get on dashboard
 app.get("/dashboard", (request, response) => {
@@ -346,14 +355,15 @@ app.get("/logout", (request, response) => {
 
 app.get('*', function (request, response) {
   let error = `<h2>It appears that you are trying to access a page that doesn't exist. Please try again.
-  below are the availeble pages:
-  <br>
+  below are the availeble pages: </h2>
+
+  <h4>
   /dashboard <br>
   /terminal <br>
   /plc_info <br>
   /events <br>
   /about <br>
-  /setting </h2>
+  /setting </h4>
   `;
   response.send(error);
 });

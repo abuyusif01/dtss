@@ -476,10 +476,8 @@ main .recent-updates a {
 
 }
 
-#run_as_root,
-#run_as_user {
+#_command {
     height: 44vh;
-    border: none;
 }
 
 input[type=submit] {

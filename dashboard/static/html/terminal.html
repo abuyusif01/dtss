@@ -229,29 +229,10 @@
 
 
                 <div class="tab">
-                    <button class="tablinks" onclick="openCity(event, 'root_terminal')" id="defaultOpen">Run as root
+                    <button class="tablinks" onclick="openCity(event, 'user_terminal')" id="defaultOpen">Run as
+                        user</button>
+                    <button class="tablinks" onclick="openCity(event, 'root_terminal')">Run as root
                     </button>
-                    <button class="tablinks" onclick="openCity(event, 'user_terminal')">Run as user</button>
-
-                </div>
-
-                <div id="root_terminal" class="tabcontent">
-                    <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>
-                    <div class="form-container">
-                        <form action="">
-                            <div class="row">
-                                <div class="command">
-                                    <textarea class="text" name="text" placeholder="Your friendly bash terminal.."
-                                        id="run_as_root"></textarea>
-                                </div>
-                            </div>
-
-                        </form>
-                        <div class="row">
-                            <input type="submit" value="Execute">
-                        </div>
-                    </div>
-
 
                 </div>
 
@@ -259,19 +240,36 @@
                     <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>
 
                     <div class="form-container">
-                        <form action="">
+                        <form action="/exec" method="post">
                             <div class="row">
 
                                 <div class="command">
-                                    <textarea class="text" name="text" placeholder="Your friendly bash terminal.."
-                                        id="run_as_user"></textarea>
+                                    <textarea class="text" name="_user" placeholder="Your friendly bash terminal.."
+                                        id="_command"></textarea>
                                 </div>
                             </div>
-
+                            <div class="row">
+                                <input type="submit" value="Execute">
+                            </div>
                         </form>
-                        <div class="row">
-                            <input type="submit" value="Execute">
-                        </div>
+
+                    </div>
+                </div>
+
+                <div id="root_terminal" class="tabcontent">
+                    <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>
+                    <div class="form-container">
+                        <form action="/exec" method="post">
+                            <div class="row">
+                                <div class="command">
+                                    <textarea class="text" name="_root" placeholder="Your friendly bash terminal.."
+                                        id="_command"></textarea>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <input type="submit" value="Execute">
+                            </div>
+                        </form>
                     </div>
                 </div>
 

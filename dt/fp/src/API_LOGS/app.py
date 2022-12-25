@@ -123,14 +123,14 @@ def card_info() -> Response:
     number of attacks from db
     """
     network_count = int(
-        utils.db_exec("select value from attacks where name='Dos';")[1:-2]
+        utils.db_fetchone("select value from attacks where name='Dos';")[1:-2]
     )
     injection_cont = int(
-        utils.db_exec("select value from attacks where name='Injection';")[1:-2]
+        utils.db_fetchone("select value from attacks where name='Injection';")[1:-2]
     )
 
     total_lines = int(
-        utils.db_exec("select value from attacks where name='Count';")[1:-2]
+        utils.db_fetchone("select value from attacks where name='Count';")[1:-2]
     )
     # x = Utils.get_total_lines("table.csv")
     #  get this from db

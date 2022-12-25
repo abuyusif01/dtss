@@ -11,7 +11,7 @@ cyber_security_qoutes = [
     "Security is a team sport",
     "If you can't afford security, you can't afford a breach",
     "Never underestimate a developer with a deadline",
-    "Don't pet strange dogs.” In other words, if it doesn't feel right, don't click on it",
+    "Don't pet strange dogs. In other words, if it doesn't feel right, don't click on it",
     "If you're not paranoid, you're not paying attention",
     "Given the choice between dancing pigs and security, users will pick dancing pigs every time",
     "Give a man an 0day and he'll have access for a day, teach a man to phish and he'll have access for life",

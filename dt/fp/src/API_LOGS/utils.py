@@ -10,6 +10,12 @@ from datetime import datetime
 import hashlib
 
 SCHEMA = "http"
+EMAIL_URL = "localhost"
+EMAIL_PORT = "5000"
+ML_URL = "localhost"
+ML_PORT = "5001"
+API_URL = "localhost"
+API_PORT = "5002"
 
 
 class Utils:
@@ -33,12 +39,19 @@ class Utils:
     except Error as e:
         print("Error while connecting to MySQL", e)
 
-    def db_exec(self, query) -> str:
+    def db_fetchone(self, query) -> str:
         cursor = self.connection.cursor()
         cursor.execute(query)
         result = cursor.fetchone()
 
         return str(result)
+
+    def db_fetchall(self, query) -> list:
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        return result
 
     def get_logs(
         self,
@@ -130,7 +143,7 @@ if __name__ == "__main__":
         # total_count = Utils.db_exec("select value from dtss where name = 'Count';")
         total_count += 1
         query = f"UPDATE attacks SET value = {total_count} WHERE name = 'Count';"
-        Utils.db_exec(query)
+        Utils.db_fetchone(query)
         Utils.connection.commit()
 
         time.sleep(0.5)
@@ -141,18 +154,18 @@ if __name__ == "__main__":
                 or df["Status"].iloc[-1] == "Command Injection TH"
             ):
                 temp = int(
-                    Utils.db_exec("select value from attacks where name='Injection';")[
-                        1:-2
-                    ]
+                    Utils.db_fetchone(
+                        "select value from attacks where name='Injection';"
+                    )[1:-2]
                 )
                 temp += 1
                 injection_count += 1
                 query = f"UPDATE attacks SET value = {temp} WHERE name = 'Injection';"
-                Utils.db_exec(query)
+                Utils.db_fetchone(query)
                 Utils.connection.commit()
 
                 """we are trying the best we can to avoid a false positive """
-                if injection_count == 5:
+                if injection_count == 15:
                     now = str(datetime.now()).split(".")[0]
                     id_hash = hashlib.sha256(str(now).encode("utf-8")).hexdigest()
                     description = "Command injection attack detected"
@@ -160,10 +173,52 @@ if __name__ == "__main__":
                     priority = "High"
                     query = f"INSERT INTO events values ('{now}', '{id_hash}', '{description}', '{trigger}', '{priority}');"
 
-                    Utils.db_exec(query)
+                    Utils.db_fetchone(query)
                     Utils.connection.commit()
                     network_count = 0
-                    # send email to admin with the total attack count in the database
+
+                    try:
+                        # get all emails from db
+                        emails = Utils.db_fetchall("select email from users;")
+                        emails = [str(x)[2:-3] for x in emails]
+
+                        for email in emails:
+                            _hash = id_hash[:8]  # take first 8 characters of hash
+                            _subject = description
+                            _username = email.split("@")[0]
+                            _time = now
+                            _category_title = "Commandline Injection"
+                            _severity_color = "red"
+                            _severity = "High"
+
+                            data = {
+                                "recv_email": email,
+                                "subject": _subject,
+                                "hash": _hash,
+                                "username": _username,
+                                "time": _time,
+                                "category_title": _category_title,
+                                "severity_color": _severity_color,
+                                "severity": _severity,
+                                "site_url": "abuyusif01.github.io",
+                            }
+
+                            url = f"{SCHEMA}://{EMAIL_URL}:{EMAIL_PORT}/send_mail"
+                            headers = {
+                                "Content-type": "application/json",
+                                "Accept": "text/plain",
+                            }
+                            try:
+                                req = requests.post(
+                                    url=url,
+                                    json=data,
+                                    headers=headers,
+                                )
+                            except Exception as e:
+                                print("Error sending email: ", e)
+
+                    except Exception as e:
+                        pass
 
                 # add one to db count
                 print("Command line injection detected and updated in the database")
@@ -172,16 +227,18 @@ if __name__ == "__main__":
             elif df["Status"].iloc[-1] == "DoS":
 
                 temp = int(
-                    Utils.db_exec("select value from attacks where name='Dos';")[1:-2]
+                    Utils.db_fetchone("select value from attacks where name='Dos';")[
+                        1:-2
+                    ]
                 )
                 temp += 1
                 network_count += 1
                 query = f"UPDATE attacks SET value = {temp} WHERE name = 'Dos';"
-                Utils.db_exec(query)
+                Utils.db_fetchone(query)
                 Utils.connection.commit()
 
                 """we are trying the best we can to avoid a false positive """
-                if network_count == 5:
+                if network_count == 15:
                     now = str(datetime.now()).split(".")[0]
                     id_hash = hashlib.sha256(str(now).encode("utf-8")).hexdigest()
                     description = "Dos attack detected"
@@ -189,9 +246,50 @@ if __name__ == "__main__":
                     priority = "High"
                     query = f"INSERT INTO events values ('{now}', '{id_hash}', '{description}', '{trigger}', '{priority}');"
                     network_count = 0
-                    Utils.db_exec(query)
+                    Utils.db_fetchone(query)
                     Utils.connection.commit()
-                    # send email to admin with the total attack count in the database
+                    try:
+                        # get all emails from db
+                        emails = Utils.db_fetchall("select email from users;")
+                        emails = [str(x)[2:-3] for x in emails]
+
+                        for email in emails:
+                            _hash = id_hash[:8]  # take first 8 characters of hash
+                            _subject = description
+                            _username = email.split("@")[0]
+                            _time = now
+                            _category_title = "DDOSs Attack"
+                            _severity_color = "red"
+                            _severity = "High"
+
+                            data = {
+                                "recv_email": email,
+                                "subject": _subject,
+                                "hash": _hash,
+                                "username": _username,
+                                "time": _time,
+                                "category_title": _category_title,
+                                "severity_color": _severity_color,
+                                "severity": _severity,
+                                "site_url": "abuyusif01.github.io",
+                            }
+
+                            url = f"{SCHEMA}://{EMAIL_URL}:{EMAIL_PORT}/send_mail"
+                            headers = {
+                                "Content-type": "application/json",
+                                "Accept": "text/plain",
+                            }
+                            try:
+                                req = requests.post(
+                                    url=url,
+                                    json=data,
+                                    headers=headers,
+                                )
+                            except Exception as e:
+                                print("Error sending email: ", e)
+
+                    except Exception as e:
+                        pass
 
                 # add one to db count
                 print("Dos attack detected and updated in the database")

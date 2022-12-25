@@ -17,17 +17,10 @@ app = Flask(__name__)
 CORS(app)
 
 
-subject = [
-    "DTSS: MAINTENANCE",
-    "DTSS: INFORMATION",
-]
-
-
 @app.route("/send_mail", methods=["POST"])
 def send_mail():
     """this send email to the given email address"""
     data = request.get_json()
-    _subject = random.choice(subject)
 
     try:
         _hash = data["hash"]
@@ -38,26 +31,10 @@ def send_mail():
         _severity = data["severity"]
         _site_url = data["site_url"]
         _recv_email = data["recv_email"]
+        _subject = data["subject"]
 
     except Exception as e:
-        if data["recv_email"] is None:
-            _recv_email = "abuyusif01@gmail.com"
-        if data["subject"] is None:
-            _subject = subject[0]
-        if data["hash"] is None:
-            _hash = "hash"
-        if data["username"] is None:
-            _username = "user_name"
-        if data["time"] is None:
-            _time = "time"
-        if data["category_title"] is None:
-            _category_title = "category_title"
-        if data["severity_color"] is None:
-            _severity_color = "red"
-        if data["severity"] is None:
-            _severity = "INFO"
-        if data["site_url"] is None:
-            _site_url = "site_url"
+        return jsonify({"status": "failed", "message": "email not sent"})
 
     # generate email template
     email_template = generate_email_template(

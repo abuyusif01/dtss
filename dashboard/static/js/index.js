@@ -5,7 +5,7 @@ var plc_logs_head = [
 ];
 
 var events_head = [
-    { Timestamp: "", Name: "", Role: "", Range: "", Message: "" }
+    { Timestamp: "", ID: "", Desc: "", IP: "", Trriggered: "", Priority: "" }
 ];
 
 
@@ -32,23 +32,6 @@ const host = "localhost"
 const port = "8000"
 
 
-
-function gen_events(table) {
-    var row = table.insertRow(1)
-    var timestamp = row.insertCell(0)
-    var name = row.insertCell(1)
-    var role = row.insertCell(2)
-    var range = row.insertCell(3)
-    var msg = row.insertCell(4)
-
-    timestamp.innerHTML = date
-    name.innerHTML = names[Math.floor((Math.random() * 4))]
-    role.innerHTML = "Admin"
-    range.innerHTML = ranges[Math.floor((Math.random() * 3))]
-    msg.innerHTML = "Updated PLC Tag"
-
-}
-
 function generateTableHead(table, data) {
     let thead = table.createTHead();
     let row = thead.insertRow();
@@ -73,11 +56,11 @@ if (plc_logs_table !== null) {
 
 } else if (events_table !== null) {
     generateTableHead(events_table, event_data);
-    for (i = 0; i < table_row_count; i++) {
-        gen_events(var_events_hightlight);
-    }
-    var rowCount = document.getElementById('events_hightlight').rows.length;
-    document.getElementById('message_count').innerHTML = rowCount - 1;
+
+    setInterval(() => {
+        get_data(host, port, events_table);
+    }, 500);
+
 }
 
 user_info("localhost", "5000");

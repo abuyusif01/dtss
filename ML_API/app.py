@@ -1,10 +1,51 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flasgger import Swagger, swag_from
 import pickle
 import warnings
 
 
 app = Flask(__name__)
+
+swagger_config = {
+    "headers": [],
+    "specs": [
+        {
+            "endpoint": "plc_log",
+            "route": "/plc_log",
+        },
+        {
+            "endpoint": "get_status",
+            "route": "/get_status",
+        },
+    ],
+    "static_url_path": "/flasgger_static",
+    "swagger_ui": True,
+    "specs_route": "/docs/",
+}
+swagger_template = {
+    "info": {
+        "title": "Digital Twin Security Solution",
+        "description": "API for Digital Twin Security Solution using Machine Learning",
+        "contact": {
+            "email": "abuyusif01@gmail.com",
+            "url": "https://abuyusif01.github.io",
+        },
+        "version": "0.0.2",
+    },
+}
+
+# set page title
+# app.config["SWAGGER"] = {
+#  "title": "Digital Twin Security Solution Dtss",
+# }
+
+# swagger = Swagger(
+#  app,
+#  config=swagger_config,
+# template=swagger_template,
+
+# )
 
 CORS(app)
 warnings.filterwarnings("ignore")  # To ignore any warnings

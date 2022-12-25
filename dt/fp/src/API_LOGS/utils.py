@@ -6,6 +6,8 @@ import time
 import warnings
 import mysql.connector as mysql
 from mysql.connector import Error
+from datetime import datetime
+import hashlib
 
 SCHEMA = "http"
 
@@ -94,6 +96,9 @@ if __name__ == "__main__":
 
     Utils = Utils()
     total_count = 0
+    injection_count = 0
+    network_count = 0
+
     while True:
         df = pd.DataFrame()  # reset dataframe
         logs = Utils.get_logs("localhost", 8000, "api_log.csv", 0)
@@ -141,9 +146,24 @@ if __name__ == "__main__":
                     ]
                 )
                 temp += 1
+                injection_count += 1
                 query = f"UPDATE attacks SET value = {temp} WHERE name = 'Injection';"
                 Utils.db_exec(query)
                 Utils.connection.commit()
+
+                """we are trying the best we can to avoid a false positive """
+                if injection_count == 5:
+                    now = str(datetime.now()).split(".")[0]
+                    id_hash = hashlib.sha256(str(now).encode("utf-8")).hexdigest()
+                    description = "Command injection attack detected"
+                    trigger = "Internal"
+                    priority = "High"
+                    query = f"INSERT INTO events values ('{now}', '{id_hash}', '{description}', '{trigger}', '{priority}');"
+
+                    Utils.db_exec(query)
+                    Utils.connection.commit()
+                    network_count = 0
+                    # send email to admin with the total attack count in the database
 
                 # add one to db count
                 print("Command line injection detected and updated in the database")
@@ -155,9 +175,23 @@ if __name__ == "__main__":
                     Utils.db_exec("select value from attacks where name='Dos';")[1:-2]
                 )
                 temp += 1
+                network_count += 1
                 query = f"UPDATE attacks SET value = {temp} WHERE name = 'Dos';"
                 Utils.db_exec(query)
                 Utils.connection.commit()
+
+                """we are trying the best we can to avoid a false positive """
+                if network_count == 5:
+                    now = str(datetime.now()).split(".")[0]
+                    id_hash = hashlib.sha256(str(now).encode("utf-8")).hexdigest()
+                    description = "Dos attack detected"
+                    trigger = "Internal"
+                    priority = "High"
+                    query = f"INSERT INTO events values ('{now}', '{id_hash}', '{description}', '{trigger}', '{priority}');"
+                    network_count = 0
+                    Utils.db_exec(query)
+                    Utils.connection.commit()
+                    # send email to admin with the total attack count in the database
 
                 # add one to db count
                 print("Dos attack detected and updated in the database")

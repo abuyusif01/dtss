@@ -14,8 +14,8 @@ EMAIL_URL = "localhost"
 EMAIL_PORT = "5000"
 ML_URL = "localhost"
 ML_PORT = "5001"
-API_URL = "localhost"
-API_PORT = "5002"
+LOG_URL = "localhost"
+LOG_PORT = "5002"
 
 
 class Utils:
@@ -208,21 +208,29 @@ if __name__ == "__main__":
                                 "Content-type": "application/json",
                                 "Accept": "text/plain",
                             }
-                            try:
-                                req = requests.post(
-                                    url=url,
-                                    json=data,
-                                    headers=headers,
+                            role = Utils.db_fetchone(
+                                "select role from users where email = '{}';".format(
+                                    email
                                 )
-                            except Exception as e:
-                                print("Error sending email: ", e)
+                            )
+                            print("role: ", role)
+                            if role == "admin" or role == "Admin":
+                                try:
+                                    req = requests.post(
+                                        url=url,
+                                        json=data,
+                                        headers=headers,
+                                    )
+                                except Exception as e:
+                                    print("Error sending email: ", e)
 
                     except Exception as e:
-                        pass
+                        print("Error sending email final: ", e)
 
                 # add one to db count
                 print("Command line injection detected and updated in the database")
                 print("Attack count: ", temp)
+                print("count injection: ", injection_count)
 
             elif df["Status"].iloc[-1] == "DoS":
 
@@ -244,10 +252,8 @@ if __name__ == "__main__":
                     description = "Dos attack detected"
                     trigger = "Internal"
                     priority = "High"
-                    query = f"INSERT INTO events values ('{now}', '{id_hash}', '{description}', '{trigger}', '{priority}');"
                     network_count = 0
-                    Utils.db_fetchone(query)
-                    Utils.connection.commit()
+
                     try:
                         # get all emails from db
                         emails = Utils.db_fetchall("select email from users;")
@@ -279,21 +285,36 @@ if __name__ == "__main__":
                                 "Content-type": "application/json",
                                 "Accept": "text/plain",
                             }
-                            try:
-                                req = requests.post(
-                                    url=url,
-                                    json=data,
-                                    headers=headers,
-                                )
-                            except Exception as e:
-                                print("Error sending email: ", e)
+                            # email only admin
 
+                            role = str(
+                                Utils.db_fetchone(
+                                    "select role from users where email = '{}';".format(
+                                        email
+                                    )
+                                )
+                            )
+                            print("role: ", role)
+                            if "admin" in role or "Admin" in role:
+                                try:
+                                    req = requests.post(
+                                        url=url,
+                                        json=data,
+                                        headers=headers,
+                                    )
+                                    print(req.__attrs__)
+                                except Exception as e:
+                                    print("Error sending email: ", e)
                     except Exception as e:
-                        pass
+                        print (e)
+                    query = f"INSERT INTO events values ('{now}', '{id_hash}', '{description}', '{trigger}', '{priority}');"
+                    Utils.db_fetchone(query)
+                    Utils.connection.commit()
 
                 # add one to db count
                 print("Dos attack detected and updated in the database")
                 print("current dos count: ", temp)
+                print("count dos: ", network_count)
 
         df.to_csv(
             "table.csv",

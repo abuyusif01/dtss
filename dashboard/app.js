@@ -78,7 +78,7 @@ app.post("/", (request, response) => {
             request.session.email = email;
             response.redirect("/dashboard");
 
-            let now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            let now = new Date().toLocaleString("en-GB", { timeZone: "Asia/Kuala_Lumpur" }, { hour12: false }).replace(/, /g, ' ').replaceAll('/', '-');
             let id_hash = sha256(now);
             let description = "User logged in";
             let trigger = email;

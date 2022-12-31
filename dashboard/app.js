@@ -11,19 +11,13 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const port = process.env.PORT || 5000;
-os.hostname() === process.env.LOCALHOST
-  ? (connection = mysql.createConnection({
-    host: process.env.DB_ADDR,
-    user: process.env.USER,
-    password: process.env.DB_PASSWD,
-    database: process.env.DB_NAME,
-  }))
-  : (connection = mysql.createConnection({
-    host: "127.0.0.1",
-    user: "abuyusif",
-    password: "hfST9bmsQeFWkaQS",
-    database: "nodelogin",
-  }));
+
+const connection = mysql.createConnection({
+  host: process.env.DB_ADDR,
+  user: process.env.USER,
+  password: process.env.DB_PASSWD,
+  database: process.env.DB_NAME,
+});
 
 const app = express();
 app.use(

@@ -47,6 +47,33 @@ app.use(express.json());
 
 
 
+app.get('/get_events', (req, res) => {
+  connection.query('SELECT * FROM events limit 14', (error, results) => {
+    if (error) {
+      console.log(error);
+      res.end();
+    }
+    else {
+      res.send(results);
+    }
+  });
+});
+
+
+app.get('/event_count', (req, res) => {
+  connection.query('SELECT COUNT(*) FROM events', (error, results) => {
+    if (error) {
+      console.log(error);
+      res.end();
+    }
+    else {
+      res.send(results[0]['COUNT(*)'].toString());
+    }
+  });
+});
+
+
+
 app.get("/", (request, response) => {
   // if the user login already, redirect to the dashboard
   if (request.session.loggedin) {

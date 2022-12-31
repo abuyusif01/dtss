@@ -80,9 +80,42 @@ function user_info(host, port) {
             document.getElementById("email").value = result["email"]
             document.getElementById("contact_number").value = result["contact"]
 
-            
         }
     }
 }
 
-export { get_data, user_info }
+function get_event(host, port, table) {
+    var req = new XMLHttpRequest();
+    req.open("GET", `http://${host}:${port}/get_events`, true);
+    req.send();
+    req.onreadystatechange = function () {
+        if (req.readyState == 4 && req.status == 200) {
+            var result = JSON.parse(req.responseText)
+
+            let col = []
+            for (var i = 0; i < result.length; i++) {
+                for (var key in result[i]) {
+                    if (col.indexOf(key) === -1) {
+                        col.push(key);
+                    }
+                }
+            }
+
+            var tr = table.insertRow(-1);
+            for (var i = 0; i < col.length; i++) {
+                var th = document.createElement("th");
+                th.innerHTML = col[i];
+                tr.appendChild(th);
+            }
+
+            for (var i = 0; i < result.length; i++) {
+                tr = table.insertRow(-1);
+                for (var j = 0; j < col.length; j++) {
+                    var tabCell = tr.insertCell(-1);
+                    tabCell.innerHTML = result[i][col[j]];
+                }
+            }
+        }
+    }
+}
+export { get_data, user_info, get_event }

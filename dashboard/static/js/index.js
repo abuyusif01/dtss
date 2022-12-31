@@ -1,4 +1,4 @@
-import { get_data, user_info } from './utils.js'
+import { get_data, user_info, get_event } from './utils.js'
 
 var plc_logs_head = [
     { Timestamp: "", From: "", To: "", Label: "", Port: "", Value: "", Status: "" }
@@ -31,7 +31,6 @@ const ranges = ["Days", "Hours", "Minutes", "Seconds"]
 const host = "localhost"
 const port = "8000"
 
-
 function generateTableHead(table, data) {
     let thead = table.createTHead();
     let row = thead.insertRow();
@@ -42,6 +41,7 @@ function generateTableHead(table, data) {
         row.appendChild(th);
     }
 }
+
 
 if (plc_logs_table !== null) {
 
@@ -55,12 +55,11 @@ if (plc_logs_table !== null) {
     }, 500);
 
 } else if (events_table !== null) {
-    generateTableHead(events_table, event_data);
-
     setInterval(() => {
-        get_data(host, port, events_table);
-    }, 500);
+        get_data(host, port, plc_logs_table);
 
+    }, 500);
+    get_event(host, 5001, events_table);
 }
 
 user_info("localhost", "5000");
@@ -68,7 +67,7 @@ user_info("localhost", "5000");
 document.getElementById("updates").appendChild(recent_update)
 
 function gen_update(id, name, time, range, msg, img) {
-    div = document.createElement('div')
+    let div = document.createElement('div')
     div.innerHTML = `<div class="update">
 <div class="profile-photo">
     <img src="./images/${img}">
@@ -87,6 +86,6 @@ function gen_update(id, name, time, range, msg, img) {
     document.getElementById(id).appendChild(div)
 
 }
-// for (i = 0; i < update_row_count; i++)
-//     gen_update("updates", names[Math.floor((Math.random() * 4))], time[Math.floor((Math.random() * 8))],
-//         ranges[Math.floor((Math.random() * 3))], "Updated PLC Tag", "profile-1.jpg")
+for (let i = 0; i < update_row_count; i++)
+    gen_update("updates", names[Math.floor((Math.random() * 4))], time[Math.floor((Math.random() * 8))],
+        ranges[Math.floor((Math.random() * 3))], "Updated PLC Tag", "profile-1.jpg")

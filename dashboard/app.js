@@ -5,8 +5,8 @@ const express = require("express");
 const session = require("express-session");
 const path = require("path");
 const os = require("os");
-const sha256 = require("crypto-js/sha256");
 const dotenv = require("dotenv");
+var crypto = require('crypto');
 
 dotenv.config();
 
@@ -100,7 +100,7 @@ app.post("/", (request, response) => {
             response.redirect("/dashboard");
 
             let now = new Date().toLocaleString("en-GB", { timeZone: "Asia/Kuala_Lumpur" }, { hour12: false }).replace(/, /g, ' ').replaceAll('/', '-');
-            let id_hash = sha256(now);
+            let id_hash = crypto.createHash('sha256').update(now).digest('hex');  
             let description = "User logged in";
             let trigger = email;
             let priority = "INFO";
@@ -233,7 +233,7 @@ app.post("/add_users", (request, response) => {
           // update the event table to show that a new user has been added same as the one in utill.py
           let now = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-          let id_hash = sha256(now);
+          let id_hash = crypto.createHash('sha256').update(now).digest('hex');  
           let description = "New user added";
           let trigger = "Admin";
           let priority = "INFO";

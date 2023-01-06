@@ -11,19 +11,16 @@ var events_head = [
 
 const plc_logs_table = document.querySelector("#plc_logs_table");
 const events_table = document.querySelector("#events_hightlight");
+const _index = document.querySelector("#_index");
+const _about = document.querySelector("#_about");
+const _terminal = document.querySelector("#_terminal");
+const _settings = document.querySelector("#_settings");
+const _events = document.querySelector("#_events");
+
+
 const recent_update = document.createElement('div')
-
 const plc_data = Object.keys(plc_logs_head[0]);
-const event_data = Object.keys(events_head[0]);
-const var_events_hightlight = document.getElementById("events_hightlight");
-
-const date = new Date()
-const table_row_count = 13
 const update_row_count = 7
-const plc_addr = ["10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.4", "10.0.0.5", "10.0.0.6", "10.0.0.7"]
-const ports = ["8080", "9000", "4454", "443", "4444"]
-const plc_status = ["Normal", "Dos", "Command Injection", "SQLi"]
-const labels = ["Sensor Update", "Plc tag", "Value Update", "Resting", "Shutting Down"]
 const names = ["Abuyusif01", "Admin", "xyz", "abc", "samha"]
 const time = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 const ranges = ["Days", "Hours", "Minutes", "Seconds"]
@@ -49,34 +46,33 @@ function generateTableHead(table, data) {
 }
 
 
-if (plc_logs_table !== null) {
-
-    // Generate Table Head from the template
+if (_index !== null) {
     generateTableHead(plc_logs_table, plc_data);
-
-    // timeout to update plc logs table is .5 seconds
     setInterval(() => {
         get_data(host, port, plc_logs_table);
-
     }, 500);
 
-} else if (events_table !== null) {
+} else if (_events !== null) {
     setInterval(() => {
         get_data(host, port, plc_logs_table);
-
     }, 500);
     get_event(host, 5001, events_table);
+
+} else if (_terminal !== null) {
+    setInterval(() => {
+        term_info(host, term_port);
+    }, 1000);
+
+} else if (_settings !== null) {
+    setInterval(() => {
+        get_data(host, port, plc_logs_table);
+
+    }, 500);
 }
 
+
 user_info(host, server_port);
-
-setInterval(() => {
-    term_info(host, term_port);
-}, 1000);
-
-
 document.getElementById("updates").appendChild(recent_update)
-
 // move this to utils
 function gen_update(id, name, time, range, msg, img) {
     let div = document.createElement('div')
@@ -101,4 +97,3 @@ function gen_update(id, name, time, range, msg, img) {
 for (let i = 0; i < update_row_count - 1; i++)
     gen_update("updates", names[Math.floor((Math.random() * 4))], time[Math.floor((Math.random() * 8))],
         ranges[Math.floor((Math.random() * 3))], "Updated PLC Tag", "profile-1.jpg")
-

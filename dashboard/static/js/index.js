@@ -31,7 +31,8 @@ const ranges = ["Days", "Hours", "Minutes", "Seconds"]
 let host = ""
 location.hostname === "localhost" ? host = "localhost" : host = location.hostname // get server url
 const port = "8000" // logs api port
-const server_port = "80" // server port
+let server_port = ""
+location.hostname === "localhost" ? server_port = "5001" : server_port = "80" // get server url
 
 console.log(host)
 

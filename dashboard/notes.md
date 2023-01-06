@@ -29,8 +29,9 @@ create table events (time_stamp varchar(30), id varchar(70) not null, descr varc
 
 # fixes for production
 1. fix login to redirect when pass not correct [done]
-2. sync all port start from 8000 and ip address
-3. fix run command to show in a next window 
+2. sync all port start from 8000 and ip address [done]
+3. fix run command to show in a next window [done]
 4. fix all pages and route make sure everything works
 5. create an about page
 6. fix update list
+7. fix pie for terminal tab

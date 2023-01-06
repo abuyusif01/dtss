@@ -4,13 +4,12 @@ const alert = require("alert");
 const express = require("express");
 const session = require("express-session");
 const path = require("path");
-const os = require("os");
 const dotenv = require("dotenv");
 var crypto = require('crypto');
 
 dotenv.config();
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT;
 
 const connection = mysql.createConnection({
   host: process.env.DB_ADDR,
@@ -100,13 +99,14 @@ app.post("/", (request, response) => {
             response.redirect("/dashboard");
 
             let now = new Date().toLocaleString("en-GB", { timeZone: "Asia/Kuala_Lumpur" }, { hour12: false }).replace(/, /g, ' ').replaceAll('/', '-');
-            let id_hash = crypto.createHash('sha256').update(now).digest('hex');  
+            let id_hash = crypto.createHash('sha256').update(now).digest('hex');
             let description = "User logged in";
             let trigger = email;
             let priority = "INFO";
             let sql = `INSERT INTO events values ('${now}', '${id_hash}', '${description}', '${trigger}', '${priority}');`;
             connection.query(sql, (err, result) => { });
           }
+          else { response.redirect("/") }
         }
       });
     }
@@ -233,7 +233,7 @@ app.post("/add_users", (request, response) => {
           // update the event table to show that a new user has been added same as the one in utill.py
           let now = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-          let id_hash = crypto.createHash('sha256').update(now).digest('hex');  
+          let id_hash = crypto.createHash('sha256').update(now).digest('hex');
           let description = "New user added";
           let trigger = "Admin";
           let priority = "INFO";

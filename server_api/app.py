@@ -16,6 +16,7 @@ _email = os.getenv("EMAIL_ADDRESS")
 _password = os.getenv("EMAIL_PASSWORD")
 _port = os.getenv("EMAIL_PORT")
 _interval = int(os.getenv("EMAIL_INTERVAL"))
+API_PORT = os.getenv("API_PORT")
 
 app = Flask(__name__)
 CORS(app)
@@ -133,4 +134,4 @@ def send_mail():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=API_PORT)

@@ -8,24 +8,30 @@ import mysql.connector as mysql
 from mysql.connector import Error
 from datetime import datetime
 import hashlib
+from dotenv import load_dotenv
 
-SCHEMA = "http"
-EMAIL_URL = "localhost"
-EMAIL_PORT = "5000"
-ML_URL = "localhost"
-ML_PORT = "5001"
-LOG_URL = "localhost"
-LOG_PORT = "5002"
+_env = load_dotenv()
+SCHEMA = os.getenv("SCHEMA")
+EMAIL_URL = os.getenv("EMAIL_URL")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+ML_URL = os.getenv("ML_URL")
+ML_PORT = os.getenv("ML_PORT")
+LOG_URL = os.getenv("LOG_URL")
+LOG_PORT = os.getenv("LOG_PORT")
+DB_HOST = os.getenv("DB_HOST")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB = os.getenv("DB")
 
 
 class Utils:
 
     try:
         connection = mysql.connect(
-            host="localhost",
-            user="abuyusif01",
-            password="1111",
-            database="dtss",
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=DB,
             autocommit=True,  # this will force commit after each query, eg select and update
         )
 
@@ -63,15 +69,18 @@ class Utils:
 
         url = f"{SCHEMA}://{host}:{port}/get_data"
 
-        return json.loads(
-            requests.get(
-                url,
-                params={
-                    "file_name": file_name,
-                    "line_number": line_number,
-                },
-            ).text.replace("'", '"')
-        )
+        try:
+            return json.loads(
+                requests.get(
+                    url,
+                    params={
+                        "file_name": file_name,
+                        "line_number": line_number,
+                    },
+                ).text.replace("'", '"')
+            )
+        except Exception as e:
+            return e  # update this as server failure
 
     def get_status(
         self,
@@ -88,18 +97,21 @@ class Utils:
 
         url = f"{SCHEMA}://{host}:{port}/get_status"
 
-        return json.loads(
-            requests.get(
-                url,
-                params={
-                    "tank_liquidlevel": tank_liquidlevel,
-                    "flowlevel": flowlevel,
-                    "bottle_liquidlevel": bottle_liquidlevel,
-                    "motor_status": motor_status,
-                    "model_name": model_name,
-                },
-            ).text.replace("'", '"')
-        )
+        try:
+            return json.loads(
+                requests.get(
+                    url,
+                    params={
+                        "tank_liquidlevel": tank_liquidlevel,
+                        "flowlevel": flowlevel,
+                        "bottle_liquidlevel": bottle_liquidlevel,
+                        "motor_status": motor_status,
+                        "model_name": model_name,
+                    },
+                ).text.replace("'", '"')
+            )
+        except Exception as e:
+            return e
 
     warnings.filterwarnings("ignore")
     cols = ["Timestamp", "From", "To", "Label", "Port", "Value", "Status"]
@@ -114,12 +126,22 @@ if __name__ == "__main__":
 
     while True:
         df = pd.DataFrame()  # reset dataframe
-        logs = Utils.get_logs("localhost", 8000, "api_log.csv", 0)
-        measurements = Utils.get_logs("localhost", 8000, "measurements.csv", 0)
+        logs = Utils.get_logs(
+            LOG_URL,
+            LOG_PORT,
+            "api_log.csv",
+            0,
+        )
+        measurements = Utils.get_logs(
+            LOG_URL,
+            LOG_PORT,
+            "measurements.csv",
+            0,
+        )
 
         status = Utils.get_status(
-            "localhost",
-            8001,
+            ML_URL,
+            ML_PORT,
             flowlevel=measurements["flowlevel"],
             tank_liquidlevel=measurements["tank_liquidlevel"],
             bottle_liquidlevel=measurements["bottle_liquidlevel"],
@@ -140,7 +162,10 @@ if __name__ == "__main__":
             ignore_index=True,
         )
 
-        # total_count = Utils.db_exec("select value from dtss where name = 'Count';")
+        total_count = int(
+            Utils.db_fetchone("select value from attacks where name = 'Count';")[1:-2]
+        )
+
         total_count += 1
         query = f"UPDATE attacks SET value = {total_count} WHERE name = 'Count';"
         Utils.db_fetchone(query)
@@ -294,7 +319,7 @@ if __name__ == "__main__":
                                     )
                                 )
                             )
-                            print("role: ", role)
+
                             if "admin" in role or "Admin" in role:
                                 try:
                                     req = requests.post(
@@ -302,11 +327,10 @@ if __name__ == "__main__":
                                         json=data,
                                         headers=headers,
                                     )
-                                    print(req.__attrs__)
                                 except Exception as e:
-                                    print("Error sending email: ", e)
+                                    print("Error sending email:", e)
                     except Exception as e:
-                        print (e)
+                        print(e)
                     query = f"INSERT INTO events values ('{now}', '{id_hash}', '{description}', '{trigger}', '{priority}');"
                     Utils.db_fetchone(query)
                     Utils.connection.commit()

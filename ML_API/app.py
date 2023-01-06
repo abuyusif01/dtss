@@ -69,37 +69,6 @@ def plc_log():
 @app.route("/get_status", methods=["GET"])
 def get_status():
 
-    # if request.get_json():
-    #     try:
-    #         model_name = request.get_json()["model_name"]
-    #         tank_liquidlevel = request.get_json()["tank_liquidlevel"]
-    #         flowlevel = request.get_json()["flowlevel"]
-    #         bottle_liquidlevel = request.get_json()["bottle_liquidlevel"]
-    #         motor_status = request.get_json()["motor_status"]
-
-    #         model = pickle.load(open("models/" + model_name + ".pkl", "rb"))
-
-    #         return jsonify(
-    #             {
-    #                 "result": str(
-    #                     model.predict(
-    #                         [
-    #                             [
-    #                                 tank_liquidlevel,
-    #                                 flowlevel,
-    #                                 bottle_liquidlevel,
-    #                                 motor_status,
-    #                             ]
-    #                         ]
-    #                     )
-    #                 )[
-    #                     2:-2
-    #                 ]  # remove some characters [] and ''
-    #             }
-    #         )
-    #     except Exception as e:
-    #         return jsonify({"error": str(e)[1:-1] + " not given"})
-    # else:
     values = request.args.to_dict()
     print(values)
     try:
@@ -126,5 +95,4 @@ def get_status():
         return jsonify({"error": str(e)[1:-1] + " not given"})
 
 
-port = 8001
-app.run(debug=True, port=port)
+app.run(debug=True, port=8001, host="0.0.0.0")

@@ -28,8 +28,12 @@ const names = ["Abuyusif01", "Admin", "xyz", "abc", "samha"]
 const time = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 const ranges = ["Days", "Hours", "Minutes", "Seconds"]
 
-const host = "localhost"
-const port = "8000"
+let host = ""
+location.hostname === "localhost" ? host = "localhost" : host = location.hostname // get server url
+const port = "8000" // logs api port
+const server_port = "80" // server port
+
+console.log(host)
 
 function generateTableHead(table, data) {
     let thead = table.createTHead();
@@ -62,10 +66,11 @@ if (plc_logs_table !== null) {
     get_event(host, 5001, events_table);
 }
 
-user_info("localhost", "5000");
+user_info(host, server_port);
 
 document.getElementById("updates").appendChild(recent_update)
 
+// move this to utils
 function gen_update(id, name, time, range, msg, img) {
     let div = document.createElement('div')
     div.innerHTML = `<div class="update">
@@ -86,6 +91,7 @@ function gen_update(id, name, time, range, msg, img) {
     document.getElementById(id).appendChild(div)
 
 }
-for (let i = 0; i < update_row_count-1; i++)
+for (let i = 0; i < update_row_count - 1; i++)
     gen_update("updates", names[Math.floor((Math.random() * 4))], time[Math.floor((Math.random() * 8))],
         ranges[Math.floor((Math.random() * 3))], "Updated PLC Tag", "profile-1.jpg")
+

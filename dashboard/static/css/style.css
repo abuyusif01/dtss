@@ -438,10 +438,17 @@ main .recent-updates a {
     margin-top: 1rem;
 }
 
+.recent-updates {
+    margin-top: 1rem;
+}
+
 .right .recent-updates h2 {
     margin-bottom: 0.8rem;
 }
 
+.recent-updates h2 {
+    margin-bottom: 0.8rem;
+}
 .right .recent-updates .updates .update {
     background: var(--color-white);
     padding: var(--card-padding);
@@ -455,12 +462,14 @@ main .recent-updates a {
 
 
 .update {
-    display: flex;
-    grid-template-columns: 2.6rem auto;
-    gap: 1rem;
-    background-color: red;
-
+    background: var(--color-white);
+    padding: var(--card-padding);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--box-shadow);
     justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 1rem;
+    transition: all 300ms ease;
 }
 
 
@@ -476,10 +485,8 @@ main .recent-updates a {
 
 }
 
-#run_as_root,
-#run_as_user {
+#_command {
     height: 44vh;
-    border: none;
 }
 
 input[type=submit] {

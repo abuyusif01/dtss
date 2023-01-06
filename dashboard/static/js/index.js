@@ -1,11 +1,11 @@
-import { get_data, user_info } from './utils.js'
+import { get_data, user_info, get_event, term_info } from './utils.js'
 
 var plc_logs_head = [
     { Timestamp: "", From: "", To: "", Label: "", Port: "", Value: "", Status: "" }
 ];
 
 var events_head = [
-    { Timestamp: "", Name: "", Role: "", Range: "", Message: "" }
+    { Timestamp: "", ID: "", Desc: "", IP: "", Trriggered: "", Priority: "" }
 ];
 
 
@@ -28,26 +28,14 @@ const names = ["Abuyusif01", "Admin", "xyz", "abc", "samha"]
 const time = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 const ranges = ["Days", "Hours", "Minutes", "Seconds"]
 
-const host = "localhost"
-const port = "8000"
+let host = ""
+location.hostname === "localhost" ? host = "localhost" : host = location.hostname // get server url
+const port = "8000" // logs api port
+let server_port = ""
+location.hostname === "localhost" ? server_port = "5001" : server_port = "80" // get server url
+const term_port = "8003"
 
-
-
-function gen_events(table) {
-    var row = table.insertRow(1)
-    var timestamp = row.insertCell(0)
-    var name = row.insertCell(1)
-    var role = row.insertCell(2)
-    var range = row.insertCell(3)
-    var msg = row.insertCell(4)
-
-    timestamp.innerHTML = date
-    name.innerHTML = names[Math.floor((Math.random() * 4))]
-    role.innerHTML = "Admin"
-    range.innerHTML = ranges[Math.floor((Math.random() * 3))]
-    msg.innerHTML = "Updated PLC Tag"
-
-}
+console.log(host)
 
 function generateTableHead(table, data) {
     let thead = table.createTHead();
@@ -59,6 +47,7 @@ function generateTableHead(table, data) {
         row.appendChild(th);
     }
 }
+
 
 if (plc_logs_table !== null) {
 
@@ -72,20 +61,25 @@ if (plc_logs_table !== null) {
     }, 500);
 
 } else if (events_table !== null) {
-    generateTableHead(events_table, event_data);
-    for (i = 0; i < table_row_count; i++) {
-        gen_events(var_events_hightlight);
-    }
-    var rowCount = document.getElementById('events_hightlight').rows.length;
-    document.getElementById('message_count').innerHTML = rowCount - 1;
+    setInterval(() => {
+        get_data(host, port, plc_logs_table);
+
+    }, 500);
+    get_event(host, 5001, events_table);
 }
 
-user_info("localhost", "5000");
+user_info(host, server_port);
+
+setInterval(() => {
+    term_info(host, term_port);
+}, 1000);
+
 
 document.getElementById("updates").appendChild(recent_update)
 
+// move this to utils
 function gen_update(id, name, time, range, msg, img) {
-    div = document.createElement('div')
+    let div = document.createElement('div')
     div.innerHTML = `<div class="update">
 <div class="profile-photo">
     <img src="./images/${img}">
@@ -104,6 +98,7 @@ function gen_update(id, name, time, range, msg, img) {
     document.getElementById(id).appendChild(div)
 
 }
-// for (i = 0; i < update_row_count; i++)
-//     gen_update("updates", names[Math.floor((Math.random() * 4))], time[Math.floor((Math.random() * 8))],
-//         ranges[Math.floor((Math.random() * 3))], "Updated PLC Tag", "profile-1.jpg")
+for (let i = 0; i < update_row_count - 1; i++)
+    gen_update("updates", names[Math.floor((Math.random() * 4))], time[Math.floor((Math.random() * 8))],
+        ranges[Math.floor((Math.random() * 3))], "Updated PLC Tag", "profile-1.jpg")
+

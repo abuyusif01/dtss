@@ -1,26 +1,22 @@
-const port = 5000;
 const mysql = require("mysql");
 const { exec } = require("child_process");
 const alert = require("alert");
 const express = require("express");
 const session = require("express-session");
 const path = require("path");
-const os = require("os");
-const { fail } = require("assert");
+const dotenv = require("dotenv");
+var crypto = require('crypto');
 
-os.hostname() === "The-Castle"
-  ? (connection = mysql.createConnection({
-    host: "127.0.0.1",
-    user: "abuyusif01",
-    password: "1111",
-    database: "dtss",
-  }))
-  : (connection = mysql.createConnection({
-    host: "127.0.0.1",
-    user: "abuyusif",
-    password: "hfST9bmsQeFWkaQS",
-    database: "nodelogin",
-  }));
+dotenv.config();
+
+const port = process.env.PORT;
+
+const connection = mysql.createConnection({
+  host: process.env.DB_ADDR,
+  user: process.env.USER,
+  password: process.env.DB_PASSWD,
+  database: process.env.DB_NAME,
+});
 
 const app = express();
 app.use(
@@ -41,6 +37,34 @@ app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(__dirname, "static/css")));
 app.use(express.static(path.join(__dirname, "static/js")));
 app.use(express.json());
+
+
+
+app.get('/get_events', (req, res) => {
+  connection.query('SELECT * FROM events limit 14', (error, results) => {
+    if (error) {
+      console.log(error);
+      res.end();
+    }
+    else {
+      res.send(results);
+    }
+  });
+});
+
+
+app.get('/event_count', (req, res) => {
+  connection.query('SELECT COUNT(*) FROM events', (error, results) => {
+    if (error) {
+      console.log(error);
+      res.end();
+    }
+    else {
+      res.send(results[0]['COUNT(*)'].toString());
+    }
+  });
+});
+
 
 
 app.get("/", (request, response) => {
@@ -74,11 +98,18 @@ app.post("/", (request, response) => {
             request.session.email = email;
             response.redirect("/dashboard");
 
+            let now = new Date().toLocaleString("en-GB", { timeZone: "Asia/Kuala_Lumpur" }, { hour12: false }).replace(/, /g, ' ').replaceAll('/', '-');
+            let id_hash = crypto.createHash('sha256').update(now).digest('hex');
+            let description = "User logged in";
+            let trigger = email;
+            let priority = "INFO";
+            let sql = `INSERT INTO events values ('${now}', '${id_hash}', '${description}', '${trigger}', '${priority}');`;
+            connection.query(sql, (err, result) => { });
           }
+          else { response.redirect("/") }
         }
       });
     }
-
   }
   catch (err) { }
 });
@@ -117,7 +148,7 @@ app.get('/userInfo', (request, response) => {
 
 app.get("/execInfo", (request, response) => {
 
-  if (!request.session.loggedin) {
+  if (request.session.loggedin) {
     let sql = `SELECT * FROM commands`;
     connection.query(sql, (err, result) => {
 
@@ -162,23 +193,25 @@ app.post("/personal_info", (request, response) => {
 
   // make sure the user is admin
 
-  let sql = `SELECT * FROM users WHERE Email = '${email}'`;
-  connection.query(sql, (err, result) => {
-    if (err) { response.json({ error: "40X - Something went wrong!!!" }); }
-    let db_pass = result[0].Password;
+  if (!request.session.loggedin) { response.redirect("/"); } else {
+    let sql = `SELECT * FROM users WHERE Email = '${email}'`;
+    connection.query(sql, (err, result) => {
+      if (err) { response.json({ error: "40X - Something went wrong!!!" }); }
+      let db_pass = result[0].Password;
 
-    if (db_pass == current_password) {
-      let sql = `UPDATE users SET Fname = '${fname}', Lname = '${lname}', Email = '${email}', Contact = '${contact}', Password = '${new_password}', Role = '${role}' WHERE Email = '${email}'`;
-      connection.query(sql, (err, result) => {
-        if (err) { response.json({ error: "40X - Something went wrong!!!" }); }
-        alert("Password changed successfully");
-      });
-    }
-    else {
-      alert("Wrong password");
-    }
-  });
+      if (db_pass == current_password) {
+        let sql = `UPDATE users SET Fname = '${fname}', Lname = '${lname}', Email = '${email}', Contact = '${contact}', Password = '${new_password}', Role = '${role}' WHERE Email = '${email}'`;
+        connection.query(sql, (err, result) => {
+          if (err) { response.json({ error: "40X - Something went wrong!!!" }); }
+          response.send("<script> alert('Updated Successfully'); window.location.href = '/dashboard'; </script>")
+        });
+      } else {
+        response.send("<script> alert('Wrong Password'); window.location.href = '/settings'; </script>")
+      }
+    });
+  }
 });
+
 
 
 app.post("/add_users", (request, response) => {
@@ -190,27 +223,47 @@ app.post("/add_users", (request, response) => {
   let _password = request.body._password;
   let password = request.body.password;
 
-
-
   // make sure the user is admin
-  if (request.session.role === "admin" || request.session.role === "Admin") {
+  if (!request.session.loggedin) { response.redirect("/"); } else {
+    if (request.session.role === "admin" || request.session.role === "Admin") {
+      if (password == _password) {
+        let sql = `INSERT INTO users (Fname, Lname, Email, Contact, Password, Role) VALUES ('${fname}', '${lname}', '${email}', '${contact}', '${password}', '${role}')`;
+        connection.query(sql, (err, result) => {
+          if (err) { response.json({ error: "40X - Something went wrong!!!" }); }
+          alert("User added successfully");
+          // update the event table to show that a new user has been added same as the one in utill.py
+          let now = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    if (password == _password) {
-      let sql = `INSERT INTO users (Fname, Lname, Email, Contact, Password, Role) VALUES ('${fname}', '${lname}', '${email}', '${contact}', '${password}', '${role}')`;
-      connection.query(sql, (err, result) => {
-        if (err) { response.json({ error: "40X - Something went wrong!!!" }); }
-        alert("User added successfully");
-      });
+          let id_hash = crypto.createHash('sha256').update(now).digest('hex');
+          let description = "New user added";
+          let trigger = "Admin";
+          let priority = "INFO";
+
+          let sql = `INSERT INTO events values ('${now}', '${id_hash}', '${description}', '${trigger}', '${priority}');`;
+          connection.query(sql, (err, result) => { if (err) { console.log(err); } });
+        });
+      }
+      else { alert("Passwords don't match"); }
     }
-    else { alert("Passwords don't match"); }
+    else { alert("Need to be admin first"); }
   }
-  else { alert("Need to be admin first"); }
 });
 
 
-app.post("/exec_user", (request, response) => {
+app.post("/exec", (request, response) => {
 
-  if (!request.session.loggedin) {
+  if (request.session.loggedin) {
+    if (request.body._root) {
+      if (request.session.role === "admin" || request.session.role === "Admin") {
+        command = `echo ${process.env.ROOT_PASSWD} | sudo -S ${request.body._root} 0>/dev/null`
+      }
+      else {
+        alert("Only admins are allowd to run commands as root");
+        response.redirect("/terminal");
+        return;
+      }
+    }
+    else { command = request.body._user; }
 
     // add the command to pending commands table
     let sql_pending = `SELECT pending from commands`;
@@ -220,7 +273,6 @@ app.post("/exec_user", (request, response) => {
       connection.query(sql, (err, result) => { });
     });
 
-    let command = request.body.command;
     try {
       exec(command, (error, stdout, stderr) => {
 
@@ -238,8 +290,7 @@ app.post("/exec_user", (request, response) => {
             let sql = `UPDATE commands SET failed = '${_failed + 1}'`;
             connection.query(sql, (err, result) => { });
           });
-          alert(stderr);
-          response.end();
+          response.send (`<pre>${error || stderr}</pre>`);
         }
 
         if (stdout) {
@@ -256,20 +307,15 @@ app.post("/exec_user", (request, response) => {
             let sql = `UPDATE commands SET success = '${_success + 1}'`;
             connection.query(sql, (err, result) => { });
           });
-          alert(stdout);
-          response.end();
-        }
 
+          response.send(`<pre>${stdout}</pre>`);
+        }
       })
     } catch (error) { response.send(error); response.end() }
   }
-  else {
-    response.send('<script>alert("Need to login")</script>');
-    response.end();
-  }
-
-
+  else { response.redirect("/"); }
 });
+
 
 // get on dashboard
 app.get("/dashboard", (request, response) => {
@@ -346,14 +392,15 @@ app.get("/logout", (request, response) => {
 
 app.get('*', function (request, response) {
   let error = `<h2>It appears that you are trying to access a page that doesn't exist. Please try again.
-  below are the availeble pages:
-  <br>
+  below are the availeble pages: </h2>
+
+  <h4>
   /dashboard <br>
   /terminal <br>
   /plc_info <br>
   /events <br>
   /about <br>
-  /setting </h2>
+  /setting </h4>
   `;
   response.send(error);
 });

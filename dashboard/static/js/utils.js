@@ -60,6 +60,25 @@ const get_data = (host, port, table) => {
     }
 }
 
+function term_info(host, port) {
+    var req = new XMLHttpRequest();
+    req.open("GET", `http://${host}:${port}/term_info`, true);
+    req.send();
+    req.onreadystatechange = function () {
+        if (req.readyState == 4 && req.status == 200) {
+            var result = JSON.parse(req.responseText.replaceAll("'", '"'))
+
+            document.getElementById("success_phero").innerHTML = result["success_count"]
+            document.getElementById("success_plabel").innerHTML = parseInt(result["success_percent"]).toFixed(2) + "%"
+
+            document.getElementById("failed_phero").innerHTML = result["failed_count"]
+            document.getElementById("failed_plabel").innerHTML = parseInt(result["failed_percent"]).toFixed(2) + "%"
+
+            document.getElementById("progress_phero").innerHTML = result["pending_count"]
+            document.getElementById("progress_plabel").innerHTML = parseInt(result["pending_percent"]).toFixed(2) + "%"
+        }
+    }
+}
 
 function user_info(host, port) {
     var req = new XMLHttpRequest();
@@ -73,16 +92,49 @@ function user_info(host, port) {
             document.getElementById("role").innerHTML = result["role"].charAt(0).toUpperCase() + result["role"].slice(1);
 
 
-            // setting user info for settings
+            // setting user info for settings too lazy to make a new function
 
             document.getElementById("fname").value = result["fname"]
             document.getElementById("lname").value = result["lname"]
             document.getElementById("email").value = result["email"]
             document.getElementById("contact_number").value = result["contact"]
 
-            
         }
     }
 }
 
-export { get_data, user_info }
+function get_event(host, port, table) {
+    var req = new XMLHttpRequest();
+    req.open("GET", `http://${host}:${port}/get_events`, true);
+    req.send();
+    req.onreadystatechange = function () {
+        if (req.readyState == 4 && req.status == 200) {
+            var result = JSON.parse(req.responseText)
+
+            let col = []
+            for (var i = 0; i < result.length; i++) {
+                for (var key in result[i]) {
+                    if (col.indexOf(key) === -1) {
+                        col.push(key);
+                    }
+                }
+            }
+
+            var tr = table.insertRow(-1);
+            for (var i = 0; i < col.length; i++) {
+                var th = document.createElement("th");
+                th.innerHTML = col[i];
+                tr.appendChild(th);
+            }
+
+            for (var i = 0; i < result.length; i++) {
+                tr = table.insertRow(-1);
+                for (var j = 0; j < col.length; j++) {
+                    var tabCell = tr.insertCell(-1);
+                    tabCell.innerHTML = result[i][col[j]];
+                }
+            }
+        }
+    }
+}
+export { get_data, user_info, get_event, term_info }

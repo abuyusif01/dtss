@@ -17,6 +17,7 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@48,400,0,0" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/meetselva/attrchange@master/js/attrchange.js"></script>
+    <script src="/index.js" defer type="module"></script>
 
 </head>
 
@@ -142,7 +143,7 @@
                             <h3>IN PROGRESS</h3>
                             <div class="value-container">
                                 <div class="fixed">
-                                    <h1 id="progress_hero">0 </h1>
+                                    <h1 id="progress_phero">0 </h1>
                                 </div>
                                 <div class="flex-item">
                                     <small class="text-muted">Commands</small>
@@ -168,16 +169,16 @@
                                     run();
                                 }, 500);
 
-                                var $round = $('.round-2')
-                                $round.attrchange({
+                                var $round_3 = $('.round-2')
+                                $round_3.attrchange({
                                     trackValues: true,
                                     callback: function (event) {
-                                        roundRadius = $round.find('circle').attr('r');
+                                        roundRadius = $round_3.find('circle').attr('r');
                                         var x = parseInt(document.getElementById("progress_plabel").innerHTML)
                                         roundPercent = x
                                         roundCircum = 2 * roundRadius * Math.PI;
                                         roundDraw = roundPercent * roundCircum / 100;
-                                        $round.css('stroke-dasharray', roundDraw + ' 999');
+                                        $round_3.css('stroke-dasharray', roundDraw + ' 999');
                                     }
                                 });
                             </script>
@@ -197,7 +198,7 @@
 
                             <div class="value-container">
                                 <div class="fixed">
-                                    <h1 id="failed_hero">0 </h1>
+                                    <h1 id="failed_phero">0 </h1>
                                 </div>
                                 <div class="flex-item">
                                     <small class="text-muted">Commands</small>
@@ -223,16 +224,16 @@
                                     __run();
                                 }, 500);
 
-                                var $round = $('.round-3')
-                                $round.attrchange({
+                                var $round_3 = $('.round-3')
+                                $round_3.attrchange({
                                     trackValues: true,
                                     callback: function (event) {
-                                        roundRadius = $round.find('circle').attr('r');
+                                        roundRadius = $round_3.find('circle').attr('r');
                                         var x = parseInt(document.getElementById("failed_plabel").innerHTML)
                                         roundPercent = x
                                         roundCircum = 2 * roundRadius * Math.PI;
                                         roundDraw = roundPercent * roundCircum / 100;
-                                        $round.css('stroke-dasharray', roundDraw + ' 999');
+                                        $round_3.css('stroke-dasharray', roundDraw + ' 999');
                                     }
                                 });
                             </script>

@@ -1,4 +1,4 @@
-import { get_data, user_info, get_event } from './utils.js'
+import { get_data, user_info, get_event, term_info } from './utils.js'
 
 var plc_logs_head = [
     { Timestamp: "", From: "", To: "", Label: "", Port: "", Value: "", Status: "" }
@@ -33,6 +33,7 @@ location.hostname === "localhost" ? host = "localhost" : host = location.hostnam
 const port = "8000" // logs api port
 let server_port = ""
 location.hostname === "localhost" ? server_port = "5001" : server_port = "80" // get server url
+const term_port = "8003"
 
 console.log(host)
 
@@ -68,6 +69,11 @@ if (plc_logs_table !== null) {
 }
 
 user_info(host, server_port);
+
+setInterval(() => {
+    term_info(host, term_port);
+}, 1000);
+
 
 document.getElementById("updates").appendChild(recent_update)
 

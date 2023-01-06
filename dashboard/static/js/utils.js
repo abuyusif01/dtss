@@ -60,6 +60,25 @@ const get_data = (host, port, table) => {
     }
 }
 
+function term_info(host, port) {
+    var req = new XMLHttpRequest();
+    req.open("GET", `http://${host}:${port}/term_info`, true);
+    req.send();
+    req.onreadystatechange = function () {
+        if (req.readyState == 4 && req.status == 200) {
+            var result = JSON.parse(req.responseText.replaceAll("'", '"'))
+
+            document.getElementById("success_phero").innerHTML = result["success_count"]
+            document.getElementById("success_plabel").innerHTML = parseInt(result["success_percent"]).toFixed(2) + "%"
+
+            document.getElementById("failed_phero").innerHTML = result["failed_count"]
+            document.getElementById("failed_plabel").innerHTML = parseInt(result["failed_percent"]).toFixed(2) + "%"
+
+            document.getElementById("progress_phero").innerHTML = result["pending_count"]
+            document.getElementById("progress_plabel").innerHTML = parseInt(result["pending_percent"]).toFixed(2) + "%"
+        }
+    }
+}
 
 function user_info(host, port) {
     var req = new XMLHttpRequest();
@@ -118,4 +137,4 @@ function get_event(host, port, table) {
         }
     }
 }
-export { get_data, user_info, get_event }
+export { get_data, user_info, get_event, term_info }

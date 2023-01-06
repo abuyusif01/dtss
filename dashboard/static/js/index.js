@@ -86,6 +86,6 @@ function gen_update(id, name, time, range, msg, img) {
     document.getElementById(id).appendChild(div)
 
 }
-for (let i = 0; i < update_row_count; i++)
+for (let i = 0; i < update_row_count-1; i++)
     gen_update("updates", names[Math.floor((Math.random() * 4))], time[Math.floor((Math.random() * 8))],
         ranges[Math.floor((Math.random() * 3))], "Updated PLC Tag", "profile-1.jpg")

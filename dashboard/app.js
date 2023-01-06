@@ -148,7 +148,7 @@ app.get('/userInfo', (request, response) => {
 
 app.get("/execInfo", (request, response) => {
 
-  if (!request.session.loggedin) {
+  if (request.session.loggedin) {
     let sql = `SELECT * FROM commands`;
     connection.query(sql, (err, result) => {
 
@@ -203,14 +203,15 @@ app.post("/personal_info", (request, response) => {
         let sql = `UPDATE users SET Fname = '${fname}', Lname = '${lname}', Email = '${email}', Contact = '${contact}', Password = '${new_password}', Role = '${role}' WHERE Email = '${email}'`;
         connection.query(sql, (err, result) => {
           if (err) { response.json({ error: "40X - Something went wrong!!!" }); }
-          alert("Password changed successfully");
+          response.send("<script> alert('Updated Successfully'); window.location.href = '/dashboard'; </script>")
         });
       } else {
-        alert("Password wrong");
+        response.send("<script> alert('Wrong Password'); window.location.href = '/settings'; </script>")
       }
     });
   }
 });
+
 
 
 app.post("/add_users", (request, response) => {
@@ -289,9 +290,7 @@ app.post("/exec", (request, response) => {
             let sql = `UPDATE commands SET failed = '${_failed + 1}'`;
             connection.query(sql, (err, result) => { });
           });
-          alert(stderr);
-          response.redirect("/terminal");
-          response.end();
+          response.send (`<pre>${error || stderr}</pre>`);
         }
 
         if (stdout) {
@@ -309,9 +308,7 @@ app.post("/exec", (request, response) => {
             connection.query(sql, (err, result) => { });
           });
 
-          alert(stdout);
-          response.redirect("/terminal");
-          response.end();
+          response.send(`<pre>${stdout}</pre>`);
         }
       })
     } catch (error) { response.send(error); response.end() }

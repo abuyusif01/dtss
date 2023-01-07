@@ -1,5 +1,7 @@
 const mysql = require("mysql");
-const { exec } = require("child_process");
+const {
+  exec
+} = require("child_process");
 const alert = require("alert");
 const express = require("express");
 const session = require("express-session");
@@ -29,53 +31,49 @@ app.use(
 
 const __static_html = path.join(__dirname, "static").replace(/\\/g, "\\\\") + "/html";
 
-
 // express config for static files, json and other stuff
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({
+  extended: true
+}));
 app.use(express.static(path.join(__dirname, "static")));
 app.use(express.static(path.join(__dirname, "static/css")));
 app.use(express.static(path.join(__dirname, "static/js")));
 app.use(express.json());
 
-
-
 app.get('/get_events', (req, res) => {
-  connection.query('SELECT * FROM events limit 14', (error, results) => {
-    if (error) {
-      console.log(error);
-      res.end();
-    }
-    else {
-      res.send(results);
-    }
-  });
+
+  if (req.session.loggedin) {
+    connection.query('SELECT * FROM events', (error, results) => {
+      if (error) {
+        console.log(error);
+        res.end();
+      } else { res.send(results); }
+    });
+  } else { res.redirect("/"); }
 });
 
+app.get('/events_count', (req, res) => {
 
-app.get('/event_count', (req, res) => {
-  connection.query('SELECT COUNT(*) FROM events', (error, results) => {
-    if (error) {
-      console.log(error);
-      res.end();
-    }
-    else {
-      res.send(results[0]['COUNT(*)'].toString());
-    }
-  });
+  if (req.session.loggedin) {
+    connection.query('SELECT COUNT(*) FROM events', (error, results) => {
+      if (error) {
+        console.log(error);
+      } else {
+        let result = results[0]['COUNT(*)'].toString();
+        res.json({
+          events_count: result
+        });
+      }
+    });
+  } else { res.redirect("/"); }
 });
-
-
 
 app.get("/", (request, response) => {
   // if the user login already, redirect to the dashboard
   if (request.session.loggedin) {
     response.redirect("/dashboard");
-  } else {
-    response.sendFile(path.join(__static_html + "/login.html"));
-
-  }
-
+  } else { response.sendFile(path.join(__static_html + "/login.html")); }
 });
 
 // login post request
@@ -91,29 +89,29 @@ app.post("/", (request, response) => {
           response.redirect("/");
           console.log(error);
           response.end();
-        }
-        else {
+        } else {
           if (results.length > 0) {
             request.session.loggedin = true;
             request.session.email = email;
             response.redirect("/dashboard");
 
-            let now = new Date().toLocaleString("en-GB", { timeZone: "Asia/Kuala_Lumpur" }, { hour12: false }).replace(/, /g, ' ').replaceAll('/', '-');
+            let now = new Date().toLocaleString("en-GB", {
+              timeZone: "Asia/Kuala_Lumpur"
+            }, {
+              hour12: false
+            }).replace(/, /g, ' ').replaceAll('/', '-');
             let id_hash = crypto.createHash('sha256').update(now).digest('hex');
             let description = "User logged in";
             let trigger = email;
             let priority = "INFO";
             let sql = `INSERT INTO events values ('${now}', '${id_hash}', '${description}', '${trigger}', '${priority}');`;
             connection.query(sql, (err, result) => { });
-          }
-          else { response.redirect("/") }
+          } else { response.redirect("/"); }
         }
       });
     }
-  }
-  catch (err) { }
+  } catch (err) { }
 });
-
 
 app.get('/userInfo', (request, response) => {
 
@@ -121,7 +119,11 @@ app.get('/userInfo', (request, response) => {
     let email = request.session.email;
     let sql = `SELECT * FROM users WHERE Email = '${email}'`;
     connection.query(sql, (err, result) => {
-      if (err) { response.json({ error: "40X - Something went wrong!!!" }); }
+      if (err) {
+        response.json({
+          error: "40X - Something went wrong!!!"
+        });
+      }
       request.session.role = result[0].Role;
       request.session.fname = result[0].Fname;
       request.session.lname = result[0].Lname;
@@ -131,18 +133,19 @@ app.get('/userInfo', (request, response) => {
       let fname = request.session.fname;
       let lname = request.session.lname;
       let contact = request.session.contact;
-      response.json(
-        {
-          fname: fname,
-          role: role,
-          lname: lname,
-          email: email,
-          contact: contact
-        }
-      );
+      response.json({
+        fname: fname,
+        role: role,
+        lname: lname,
+        email: email,
+        contact: contact
+      });
+    });
+  } else {
+    response.json({
+      error: "403 - Not Authenticated"
     });
   }
-  else { response.json({ error: "403 - Not Authenticated" }); }
 
 })
 
@@ -160,22 +163,23 @@ app.get("/execInfo", (request, response) => {
       let failed_percent = parseInt((fail / count) * 100).toString();
       let pending_percent = parseInt((pending / count) * 100).toString();
 
-      response.json(
-        {
-          success: success,
-          fail: fail,
-          pending: pending,
-          count: count,
-          success_percent: success_percent,
-          failed_percent: failed_percent,
-          pending_percent: pending_percent
+      response.json({
+        success: success,
+        fail: fail,
+        pending: pending,
+        count: count,
+        success_percent: success_percent,
+        failed_percent: failed_percent,
+        pending_percent: pending_percent
 
-        }
-      );
+      });
     });
-  } else { response.json({ error: "403 - Not Authenticated" }); }
+  } else {
+    response.json({
+      error: "403 - Not Authenticated"
+    });
+  }
 });
-
 
 app.post("/personal_info", (request, response) => {
 
@@ -187,22 +191,31 @@ app.post("/personal_info", (request, response) => {
   let new_password = request.body.new_password;
   let role = request.body._role;
 
-
   // get user password from the database to check if the user is the owner of the account or not
   // then update the info if everything is ok
 
   // make sure the user is admin
 
-  if (!request.session.loggedin) { response.redirect("/"); } else {
+  if (!request.session.loggedin) {
+    response.redirect("/");
+  } else {
     let sql = `SELECT * FROM users WHERE Email = '${email}'`;
     connection.query(sql, (err, result) => {
-      if (err) { response.json({ error: "40X - Something went wrong!!!" }); }
+      if (err) {
+        response.json({
+          error: "40X - Something went wrong!!!"
+        });
+      }
       let db_pass = result[0].Password;
-
       if (db_pass == current_password) {
-        let sql = `UPDATE users SET Fname = '${fname}', Lname = '${lname}', Email = '${email}', Contact = '${contact}', Password = '${new_password}', Role = '${role}' WHERE Email = '${email}'`;
+        let sql =
+          `UPDATE users SET Fname = '${fname}', Lname = '${lname}', Email = '${email}', Contact = '${contact}', Password = '${new_password}', Role = '${role}' WHERE Email = '${email}'`;
         connection.query(sql, (err, result) => {
-          if (err) { response.json({ error: "40X - Something went wrong!!!" }); }
+          if (err) {
+            response.json({
+              error: "40X - Something went wrong!!!"
+            });
+          }
           response.send("<script> alert('Updated Successfully'); window.location.href = '/dashboard'; </script>")
         });
       } else {
@@ -211,8 +224,6 @@ app.post("/personal_info", (request, response) => {
     });
   }
 });
-
-
 
 app.post("/add_users", (request, response) => {
   let fname = request.body.fname;
@@ -224,13 +235,20 @@ app.post("/add_users", (request, response) => {
   let password = request.body.password;
 
   // make sure the user is admin
-  if (!request.session.loggedin) { response.redirect("/"); } else {
+  if (!request.session.loggedin) {
+    response.redirect("/");
+  } else {
     if (request.session.role === "admin" || request.session.role === "Admin") {
       if (password == _password) {
-        let sql = `INSERT INTO users (Fname, Lname, Email, Contact, Password, Role) VALUES ('${fname}', '${lname}', '${email}', '${contact}', '${password}', '${role}')`;
+        let sql =
+          `INSERT INTO users (Fname, Lname, Email, Contact, Password, Role) VALUES ('${fname}', '${lname}', '${email}', '${contact}', '${password}', '${role}')`;
         connection.query(sql, (err, result) => {
-          if (err) { response.json({ error: "40X - Something went wrong!!!" }); }
-          alert("User added successfully");
+          if (err) {
+            response.json({
+              error: "40X - Something went wrong!!!"
+            });
+          }
+          response.send("<script> alert('User Created Successfully'); window.location.href = '/dashboard'; </script>")
           // update the event table to show that a new user has been added same as the one in utill.py
           let now = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
@@ -242,13 +260,10 @@ app.post("/add_users", (request, response) => {
           let sql = `INSERT INTO events values ('${now}', '${id_hash}', '${description}', '${trigger}', '${priority}');`;
           connection.query(sql, (err, result) => { if (err) { console.log(err); } });
         });
-      }
-      else { alert("Passwords don't match"); }
-    }
-    else { alert("Need to be admin first"); }
+      } else { response.send("<script> alert('Password not matched'); window.location.href = '/settings'; </script>") }
+    } else { response.send("<script> alert('Needs to be admin first'); window.location.href = '/dashboard'; </script>") }
   }
 });
-
 
 app.post("/exec", (request, response) => {
 
@@ -256,14 +271,12 @@ app.post("/exec", (request, response) => {
     if (request.body._root) {
       if (request.session.role === "admin" || request.session.role === "Admin") {
         command = `echo ${process.env.ROOT_PASSWD} | sudo -S ${request.body._root} 0>/dev/null`
-      }
-      else {
+      } else {
         alert("Only admins are allowd to run commands as root");
         response.redirect("/terminal");
         return;
       }
-    }
-    else { command = request.body._user; }
+    } else { command = request.body._user; }
 
     // add the command to pending commands table
     let sql_pending = `SELECT pending from commands`;
@@ -290,7 +303,7 @@ app.post("/exec", (request, response) => {
             let sql = `UPDATE commands SET failed = '${_failed + 1}'`;
             connection.query(sql, (err, result) => { });
           });
-          response.send (`<pre>${error || stderr}</pre>`);
+          response.send(`<pre>${error || stderr}</pre>`);
         }
 
         if (stdout) {
@@ -311,20 +324,19 @@ app.post("/exec", (request, response) => {
           response.send(`<pre>${stdout}</pre>`);
         }
       })
-    } catch (error) { response.send(error); response.end() }
-  }
-  else { response.redirect("/"); }
+    } catch (error) {
+      response.send(`<pre>${error}</pre>`);
+      response.end()
+    }
+  } else { response.redirect("/"); }
 });
-
 
 // get on dashboard
 app.get("/dashboard", (request, response) => {
   if (request.session.loggedin) {
     response.sendFile(path.join(__static_html + "/index.html"));
-  }
-  else {
+  } else {
     response.sendFile(path.join(__static_html + "/login.html"));
-    alert("Please login to view this page!");
     response.redirect("/");
   }
 });
@@ -332,51 +344,31 @@ app.get("/dashboard", (request, response) => {
 app.get("/terminal", (request, response) => {
   if (request.session.loggedin) {
     response.sendFile(path.join(__static_html + "/terminal.html"));
-  }
-  else {
-    alert("Please login to view this page!");
-    response.redirect("/");
-  }
+  } else { response.redirect("/"); }
 });
 
 app.get("/plc_info", (request, response) => {
   if (request.session.loggedin) {
     response.sendFile(path.join(__static_html + "/plc_info.html"));
-  }
-  else {
-    alert("Please login to view this page!");
-    response.redirect("/");
-  }
+  } else { response.redirect("/"); }
 });
 
 app.get("/events", (request, response) => {
   if (request.session.loggedin) {
     response.sendFile(path.join(__static_html + "/events.html"));
-  }
-  else {
-    alert("Please login to view this page!");
-    response.redirect("/");
-  }
+  } else { response.redirect("/"); }
 });
 
 app.get("/about", (request, response) => {
   if (request.session.loggedin) {
     response.sendFile(path.join(__static_html + "/about.html"));
-  }
-  else {
-    alert("Please login to view this page!");
-    response.redirect("/");
-  }
+  } else { response.redirect("/"); }
 });
 
 app.get("/settings", (request, response) => {
   if (request.session.loggedin) {
     response.sendFile(path.join(__static_html + "/settings.html"));
-  }
-  else {
-    alert("Please login to view this page!");
-    response.redirect("/");
-  }
+  } else { response.redirect("/"); }
 });
 
 app.get("/logout", (request, response) => {
@@ -384,10 +376,7 @@ app.get("/logout", (request, response) => {
   if (request.session.loggedin) {
     request.session.destroy();
     response.redirect("/");
-  }
-  else {
-    response.redirect("/");
-  }
+  } else { response.redirect("/"); }
 });
 
 app.get('*', function (request, response) {

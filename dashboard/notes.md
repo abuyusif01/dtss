@@ -25,13 +25,17 @@ create table events (time_stamp varchar(30), id varchar(70) not null, descr varc
 
 
 # rules
-1. event can only be update once [done]
+1. event can only be update once in 10m [done]
 
 # fixes for production
 1. fix login to redirect when pass not correct [done]
-2. sync all port start from 8000 and ip address [done]
-3. fix run command to show in a next window [done]
-4. fix all pages and route make sure everything works
-5. create an about page
-6. fix update list
-7. fix pie for terminal tab
+2. sync all port start from 8000 and ip addresses [done]
+3. fix run command to show in next window [done]
+4. fix all pages and route make sure everything works [done]
+5. create an about page [done]
+6. update list using data from db
+7. creat pie for terminal tab [done]
+8. fix setting pie [done]
+9. after adduser redirect to dashboard [done]
+10. render technical report to about page + theme it 
+11. authentication for all routes [done]

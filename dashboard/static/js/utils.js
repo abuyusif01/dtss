@@ -1,4 +1,4 @@
-const get_data = (host, port, table) => {
+const get_data = (host, port, table, x) => {
     var table_req = new XMLHttpRequest();
     var card_req = new XMLHttpRequest();
 
@@ -16,30 +16,30 @@ const get_data = (host, port, table) => {
         }
 
     */
-    table_req.open("GET", `http://${host}:${port}/gen_table?file_name=table.csv`);
+    if (x == 1) { // if x is given as 1, then we are on the index page
+        table_req.open("GET", `http://${host}:${port}/gen_table?file_name=table.csv`);
+        table_req.send();
+        table_req.onreadystatechange = function () {
+            if (table_req.readyState == 4 && table_req.status == 200) {
+                var row = table.insertRow(1)
+                var timestamp = row.insertCell(0)
+                var from_addr = row.insertCell(1)
+                var to_addr = row.insertCell(2)
+                var label = row.insertCell(3)
+                var port = row.insertCell(4)
+                var bytes = row.insertCell(5)
+                var status = row.insertCell(6)
 
-    table_req.send();
-
-    table_req.onreadystatechange = function () {
-        if (table_req.readyState == 4 && table_req.status == 200) {
-            var row = table.insertRow(1)
-            var timestamp = row.insertCell(0)
-            var from_addr = row.insertCell(1)
-            var to_addr = row.insertCell(2)
-            var label = row.insertCell(3)
-            var port = row.insertCell(4)
-            var bytes = row.insertCell(5)
-            var status = row.insertCell(6)
-
-            // conver this to json, easier to work with
-            var temp = JSON.parse(table_req.responseText.replaceAll("'", '"'))
-            timestamp.innerHTML = temp["Timestamp"]
-            from_addr.innerHTML = temp["From"]
-            to_addr.innerHTML = temp["To"]
-            label.innerHTML = temp["Label"]
-            bytes.innerHTML = temp["Value"]
-            port.innerHTML = temp["Port"]
-            status.innerHTML = temp["Status"]
+                // conver this to json, easier to work with
+                var temp = JSON.parse(table_req.responseText.replaceAll("'", '"'))
+                timestamp.innerHTML = temp["Timestamp"]
+                from_addr.innerHTML = temp["From"]
+                to_addr.innerHTML = temp["To"]
+                label.innerHTML = temp["Label"]
+                bytes.innerHTML = temp["Value"]
+                port.innerHTML = temp["Port"]
+                status.innerHTML = temp["Status"]
+            }
         }
     }
 
@@ -82,6 +82,7 @@ function term_info(host, port) {
 
 function user_info(host, port) {
     var req = new XMLHttpRequest();
+    var event_req = new XMLHttpRequest();
 
     req.open("GET", `http://${host}:${port}/userInfo`, true);
     req.send();
@@ -90,15 +91,29 @@ function user_info(host, port) {
             var result = JSON.parse(req.responseText)
             document.getElementById("name").innerHTML = result["fname"].charAt(0).toUpperCase() + result["fname"].slice(1);
             document.getElementById("role").innerHTML = result["role"].charAt(0).toUpperCase() + result["role"].slice(1);
+        }
+    }
 
+    event_req.open("GET", `http://${host}:${port}/events_count`, true);
+    event_req.send();
+    event_req.onreadystatechange = function () {
+        if (event_req.readyState == 4 && event_req.status == 200) {
+            var result = JSON.parse(event_req.responseText)
+            document.getElementById("events_count").innerHTML = result["events_count"]
+        }
+    }
+}
 
-            // setting user info for settings too lazy to make a new function
-
+function user_data(host, port) {
+    var req = new XMLHttpRequest();
+    req.open("GET", `http://${host}:${port}/userInfo`, true);
+    req.send();
+    req.onreadystatechange = function () {
+        if (req.readyState == 4 && req.status == 200) {
             document.getElementById("fname").value = result["fname"]
             document.getElementById("lname").value = result["lname"]
             document.getElementById("email").value = result["email"]
             document.getElementById("contact_number").value = result["contact"]
-
         }
     }
 }
@@ -137,4 +152,4 @@ function get_event(host, port, table) {
         }
     }
 }
-export { get_data, user_info, get_event, term_info }
+export { get_data, user_info, get_event, term_info, user_data }

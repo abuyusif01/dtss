@@ -17,7 +17,6 @@ const _terminal = document.querySelector("#_terminal");
 const _settings = document.querySelector("#_settings");
 const _events = document.querySelector("#_events");
 
-
 const recent_update = document.createElement('div')
 const plc_data = Object.keys(plc_logs_head[0]);
 const update_row_count = 7
@@ -30,9 +29,7 @@ location.hostname === "localhost" ? host = "localhost" : host = location.hostnam
 const port = "8000" // logs api port
 let server_port = ""
 location.hostname === "localhost" ? server_port = "5001" : server_port = "80" // get server url
-const term_port = "8003"
-
-console.log(host)
+const term_port = "8003" //term donut api port
 
 function generateTableHead(table, data) {
     let thead = table.createTHead();
@@ -44,7 +41,6 @@ function generateTableHead(table, data) {
         row.appendChild(th);
     }
 }
-
 
 if (_index !== null) {
     generateTableHead(plc_logs_table, plc_data);

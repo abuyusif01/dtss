@@ -42,21 +42,31 @@ app.use(express.static(path.join(__dirname, "static/js")));
 app.use(express.json());
 
 app.get('/get_events', (req, res) => {
-  connection.query('SELECT * FROM events limit 14', (error, results) => {
-    if (error) {
-      console.log(error);
-      res.end();
-    } else { res.send(results); }
-  });
+
+  if (req.session.loggedin) {
+    connection.query('SELECT * FROM events', (error, results) => {
+      if (error) {
+        console.log(error);
+        res.end();
+      } else { res.send(results); }
+    });
+  } else { res.redirect("/"); }
 });
 
-app.get('/event_count', (req, res) => {
-  connection.query('SELECT COUNT(*) FROM events', (error, results) => {
-    if (error) {
-      console.log(error);
-      res.end();
-    } else { res.send(results[0]['COUNT(*)'].toString()); }
-  });
+app.get('/events_count', (req, res) => {
+
+  if (req.session.loggedin) {
+    connection.query('SELECT COUNT(*) FROM events', (error, results) => {
+      if (error) {
+        console.log(error);
+      } else {
+        let result = results[0]['COUNT(*)'].toString();
+        res.json({
+          events_count: result
+        });
+      }
+    });
+  } else { res.redirect("/"); }
 });
 
 app.get("/", (request, response) => {
@@ -197,7 +207,6 @@ app.post("/personal_info", (request, response) => {
         });
       }
       let db_pass = result[0].Password;
-
       if (db_pass == current_password) {
         let sql =
           `UPDATE users SET Fname = '${fname}', Lname = '${lname}', Email = '${email}', Contact = '${contact}', Password = '${new_password}', Role = '${role}' WHERE Email = '${email}'`;
@@ -316,7 +325,7 @@ app.post("/exec", (request, response) => {
         }
       })
     } catch (error) {
-      response.send(error);
+      response.send(`<pre>${error}</pre>`);
       response.end()
     }
   } else { response.redirect("/"); }

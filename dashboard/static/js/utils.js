@@ -82,6 +82,7 @@ function term_info(host, port) {
 
 function user_info(host, port) {
     var req = new XMLHttpRequest();
+    var event_req = new XMLHttpRequest();
 
     req.open("GET", `http://${host}:${port}/userInfo`, true);
     req.send();
@@ -90,6 +91,15 @@ function user_info(host, port) {
             var result = JSON.parse(req.responseText)
             document.getElementById("name").innerHTML = result["fname"].charAt(0).toUpperCase() + result["fname"].slice(1);
             document.getElementById("role").innerHTML = result["role"].charAt(0).toUpperCase() + result["role"].slice(1);
+        }
+    }
+
+    event_req.open("GET", `http://${host}:${port}/events_count`, true);
+    event_req.send();
+    event_req.onreadystatechange = function () {
+        if (event_req.readyState == 4 && event_req.status == 200) {
+            var result = JSON.parse(event_req.responseText)
+            document.getElementById("events_count").innerHTML = result["events_count"]
         }
     }
 }

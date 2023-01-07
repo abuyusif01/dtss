@@ -19,7 +19,7 @@ class FPCPS(MiniCPS):
 
         self.name = name
         self.net = net
-        debug = True
+        debug = False
         net.start()
         net.pingAll()
 
@@ -50,15 +50,11 @@ class FPCPS(MiniCPS):
             plc3.cmd(sys.executable + " -u " + " plc3.py  &> logs/plc3.log &")
             time.sleep(sleep)
             plc2.cmd(sys.executable + " -u " + " plc2.py &> logs/plc2.log &")
-            time.sleep(sleep * 3)  # sleeping a bit more to make sure the PLCs are up
-
+            time.sleep(sleep)
             plc1.cmd(sys.executable + " -u " + " plc1.py  &> logs/plc1.log &")
-            time.sleep(sleep)
-            net.terms += makeTerm(plc1, title="plc1", display=None)
-            time.sleep(sleep)
+            time.sleep(sleep * 3)  # sleeping a bit more to make sure the PLCs are up
+            
             net.terms += makeTerm(hmi, title="hmi", display=None)
-            time.sleep(sleep)
-            server.cmd(sys.executable + " -u " + " server.py &> logs/server.log &")
             time.sleep(sleep)
             net.terms += makeTerm(attacker, title="attacker", display=None)
             time.sleep(sleep)

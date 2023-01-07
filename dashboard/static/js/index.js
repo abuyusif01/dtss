@@ -1,4 +1,4 @@
-import { get_data, user_info, get_event, term_info } from './utils.js'
+import { get_data, user_info, get_event, term_info, user_data } from './utils.js'
 
 var plc_logs_head = [
     { Timestamp: "", From: "", To: "", Label: "", Port: "", Value: "", Status: "" }
@@ -49,12 +49,12 @@ function generateTableHead(table, data) {
 if (_index !== null) {
     generateTableHead(plc_logs_table, plc_data);
     setInterval(() => {
-        get_data(host, port, plc_logs_table);
+        get_data(host, port, plc_logs_table, 1);
     }, 500);
 
 } else if (_events !== null) {
     setInterval(() => {
-        get_data(host, port, plc_logs_table);
+        get_data(host, port, plc_logs_table, 0);
     }, 500);
     get_event(host, 5001, events_table);
 
@@ -64,12 +64,11 @@ if (_index !== null) {
     }, 1000);
 
 } else if (_settings !== null) {
+    user_data(host, server_port);
     setInterval(() => {
-        get_data(host, port, plc_logs_table);
-
+        get_data(host, port, plc_logs_table, 0);
     }, 500);
 }
-
 
 user_info(host, server_port);
 document.getElementById("updates").appendChild(recent_update)
@@ -90,10 +89,9 @@ function gen_update(id, name, time, range, msg, img) {
         </small>
     </div>
 </div>`;
-
     document.getElementById(id).appendChild(div)
-
 }
+
 for (let i = 0; i < update_row_count - 1; i++)
     gen_update("updates", names[Math.floor((Math.random() * 4))], time[Math.floor((Math.random() * 8))],
         ranges[Math.floor((Math.random() * 3))], "Updated PLC Tag", "profile-1.jpg")

@@ -52,10 +52,7 @@ class FPCPS(MiniCPS):
             plc2.cmd(sys.executable + " -u " + " plc2.py &> logs/plc2.log &")
             time.sleep(sleep)
             plc1.cmd(sys.executable + " -u " + " plc1.py  &> logs/plc1.log &")
-            time.sleep(sleep * 3)  # sleeping a bit more to make sure the PLCs are up
-            
-            net.terms += makeTerm(hmi, title="hmi", display=None)
-            time.sleep(sleep)
+            time.sleep(sleep * 3)  # sleeping a bit more to make sure the PLCs are up and running
             net.terms += makeTerm(attacker, title="attacker", display=None)
             time.sleep(sleep)
 

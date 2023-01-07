@@ -49,11 +49,11 @@ const get_data = (host, port, table, x) => {
 
         if (card_req.readyState == 4 && card_req.status == 200) {
             var result = JSON.parse(card_req.responseText.replaceAll("'", '"'))
-            document.getElementById("network_hero").innerHTML = parseInt(result["network_count"])
-            document.getElementById("network_plabel").innerHTML = parseInt(result["network_percent"]).toFixed(2) + "%"
+            document.getElementById("network_hero").innerHTML = parseFloat(result["network_count"])
+            document.getElementById("network_plabel").innerHTML = parseFloat(result["network_percent"]).toFixed(2) + "%"
 
-            document.getElementById("injection_hero").innerHTML = parseInt(result["injection_count"])
-            document.getElementById("injection_plabel").innerHTML = parseInt(result["injection_percent"]).toFixed(2) + "%"
+            document.getElementById("injection_hero").innerHTML = parseFloat(result["injection_count"])
+            document.getElementById("injection_plabel").innerHTML = parseFloat(result["injection_percent"]).toFixed(2) + "%"
 
 
         }
@@ -69,13 +69,13 @@ function term_info(host, port) {
             var result = JSON.parse(req.responseText.replaceAll("'", '"'))
 
             document.getElementById("success_phero").innerHTML = result["success_count"]
-            document.getElementById("success_plabel").innerHTML = parseInt(result["success_percent"]).toFixed(2) + "%"
+            document.getElementById("success_plabel").innerHTML = parseFloat(result["success_percent"]).toFixed(2) + "%"
 
             document.getElementById("failed_phero").innerHTML = result["failed_count"]
-            document.getElementById("failed_plabel").innerHTML = parseInt(result["failed_percent"]).toFixed(2) + "%"
+            document.getElementById("failed_plabel").innerHTML = parseFloat(result["failed_percent"]).toFixed(2) + "%"
 
             document.getElementById("progress_phero").innerHTML = result["pending_count"]
-            document.getElementById("progress_plabel").innerHTML = parseInt(result["pending_percent"]).toFixed(2) + "%"
+            document.getElementById("progress_plabel").innerHTML = parseFloat(result["pending_percent"]).toFixed(2) + "%"
         }
     }
 }
@@ -110,6 +110,7 @@ function user_data(host, port) {
     req.send();
     req.onreadystatechange = function () {
         if (req.readyState == 4 && req.status == 200) {
+            var result = JSON.parse(req.responseText)
             document.getElementById("fname").value = result["fname"]
             document.getElementById("lname").value = result["lname"]
             document.getElementById("email").value = result["email"]

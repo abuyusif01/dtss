@@ -110,6 +110,7 @@ function user_data(host, port) {
     req.send();
     req.onreadystatechange = function () {
         if (req.readyState == 4 && req.status == 200) {
+            var result = JSON.parse(req.responseText)
             document.getElementById("fname").value = result["fname"]
             document.getElementById("lname").value = result["lname"]
             document.getElementById("email").value = result["email"]

@@ -9,7 +9,7 @@
   "author": "abuyusif01",
   "license": "ISC",
   "dependencies": {
-    "alert": "^5.0.10",
+    "alert": "^5.1.6",
     "crypto-js": "^4.1.1",
     "dotenv": "^16.0.3",
     "express": "^4.17.3",

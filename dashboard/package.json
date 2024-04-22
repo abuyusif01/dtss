@@ -13,7 +13,7 @@
     "crypto-js": "^4.1.1",
     "dotenv": "^16.0.3",
     "express": "^4.17.3",
-    "express-session": "^1.17.2",
+    "express-session": "^1.18.0",
     "mysql": "^2.18.1",
     "popups": "^1.1.3"
   }

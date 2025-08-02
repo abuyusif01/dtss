@@ -1,5 +1,5 @@
 # init environment
-FROM ubuntu:latest
+FROM ubuntu:24.10
 
 
 # copy files

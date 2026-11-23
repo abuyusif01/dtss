@@ -12,11 +12,28 @@ from datetime import datetime
 
 
 _env = load_dotenv()
+
+# SMTP
 _email = os.getenv("EMAIL_ADDRESS")
 _password = os.getenv("EMAIL_PASSWORD")
-_port = os.getenv("EMAIL_PORT")
-_interval = int(os.getenv("EMAIL_INTERVAL"))
-API_PORT = os.getenv("API_PORT")
+_port = os.getenv("EMAIL_PORT", "587")
+_interval = int(os.getenv("EMAIL_INTERVAL", "60"))
+
+# Database
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_NAME = os.getenv("DB_NAME", "dtss")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+
+# Server
+API_PORT = int(os.getenv("API_PORT", "5001"))
+DEBUG = os.getenv("FLASK_DEBUG", "false").lower() == "true"
+
+if not DB_USER or not DB_PASSWORD:
+    raise SystemExit(
+        "DB_USER and DB_PASSWORD must be set (see .env.example). "
+        "Database credentials are no longer read from source."
+    )
 
 app = Flask(__name__)
 CORS(app)
@@ -43,10 +60,10 @@ def send_mail():
 
     try:
         connection = mysql.connect(
-            host="localhost",
-            user="abuyusif01",
-            password="1111",
-            database="dtss",
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=DB_NAME,
             autocommit=True,  # this will force commit after each query, eg select and update
         )
 
@@ -134,4 +151,4 @@ def send_mail():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=API_PORT)
+    app.run(debug=DEBUG, host="0.0.0.0", port=API_PORT)

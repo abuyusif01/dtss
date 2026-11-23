@@ -82,13 +82,7 @@ sudo python3 run.py
 
 # 3. alerting service needs its environment first
 cd server_api
-cat > .env <<'ENV'
-EMAIL_ADDRESS=you@example.com
-EMAIL_PASSWORD=app-password
-EMAIL_PORT=587
-EMAIL_INTERVAL=60
-API_PORT=5001
-ENV
+cp .env.example .env    # SMTP + MySQL values
 python app.py
 
 # 4. dashboard
@@ -99,7 +93,7 @@ npm install && npm start
 ## Known limitations
 
 - **Academic prototype.** Built for a research project, not production. The twin is a reduced SWaT model, not the full plant.
-- **Credentials.** SMTP settings come from `.env`, but the MySQL host, user and password are still hardcoded in `server_api/app.py`. Move those to the environment before running this anywhere shared.
+- **Credentials.** Everything comes from `.env` (see `server_api/.env.example`). The service exits if the database user or password is missing.
 - **Detection scope.** The models classify sensor-level anomalies. They do not detect network-layer attacks directly; the attacker host in the topology is there to generate test traffic.
 - **Dataset.** Training data derives from SWaT sensor behaviour. Results do not transfer to other plants without retraining.
 
